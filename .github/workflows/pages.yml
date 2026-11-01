@@ -1,0 +1,50 @@
+name: Udgiv kortspil på GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: Kasino/package-lock.json
+      - run: npm ci
+        working-directory: Kasino
+      - run: npm run build -- --base=/${{ github.event.repository.name }}/kasino/
+        working-directory: Kasino
+      - name: Saml hjemmesiden
+        run: |
+          mkdir -p _site/es-makker _site/kasino
+          cp index.html styles.css _site/
+          cp es-makker/index.html _site/es-makker/
+          cp -R es-makker/css es-makker/js _site/es-makker/
+          cp -R Kasino/dist/. _site/kasino/
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

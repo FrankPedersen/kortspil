@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Vælg mellem Es Makker og Kasino – to danske kortspil, du kan spille direkte i browseren."
+    />
+    <meta name="theme-color" content="#123c30" />
+    <link rel="stylesheet" href="./styles.css" />
+    <title>Kortspil – vælg et spil</title>
+  </head>
+  <body>
+    <main class="lobby">
+      <header class="intro">
+        <p class="eyebrow">Danske kortspil · spil direkte i browseren</p>
+        <h1>Hvad skal vi spille?</h1>
+        <p class="lead">
+          Find kortene frem, vælg et spil, og tag plads ved bordet.
+        </p>
+      </header>
+
+      <section class="games" aria-label="Vælg et kortspil">
+        <article class="game-card game-card--es-makker">
+          <div class="game-mark" aria-hidden="true">♠</div>
+          <p class="game-type">Meldinger og makkerskab</p>
+          <h2>Es Makker</h2>
+          <p class="game-description">
+            Meld kontrakten, find din makker, og spil stik hjem i et dansk
+            kortspil for fire.
+          </p>
+          <a class="play-link" href="./es-makker/">
+            Spil Es Makker <span aria-hidden="true">→</span>
+          </a>
+        </article>
+
+        <article class="game-card game-card--kasino">
+          <div class="game-mark" aria-hidden="true">♦</div>
+          <p class="game-type">Byg, saml og tag stik</p>
+          <h2>Kasino</h2>
+          <p class="game-description">
+            Saml kort fra bordet, byg værdier, og nå 21 point før modstanderne.
+            Spil mod robotter eller sammen.
+          </p>
+          <a class="play-link" href="./kasino/">
+            Spil Kasino <span aria-hidden="true">→</span>
+          </a>
+        </article>
+      </section>
+
+      <footer>
+        <p>God fornøjelse – og held og lykke ved bordet.</p>
+      </footer>
+    </main>
+  </body>
+</html>

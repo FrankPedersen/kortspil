@@ -1,0 +1,935 @@
+/* =============================================================
+   ES MAKKER - style.css
+   Layout, kortdesign, animationer og spilbord
+   ============================================================= */
+
+:root {
+  --felt-dark:   #0b3d24;
+  --felt:        #14603a;
+  --felt-light:  #1c7d4c;
+  --wood:        #5b3a21;
+  --wood-light:  #7a4f2d;
+
+  --ink:         #10261c;
+  --paper:       #fdfdf8;
+  --paper-dim:   #e9e9df;
+
+  --gold:        #e2b53f;
+  --gold-dim:    #a9862c;
+  --red:         #d4261a;
+  --red-soft:    #e8483a;
+  --black:       #1a1a1a;
+
+  --accent:      #3fa9e2;
+  --danger:      #d9534f;
+  --ok:          #4caf50;
+
+  --card-w: 74px;
+  --card-h: 106px;
+  --pip-size: calc(var(--card-w) * 0.21);
+
+  /* Din egen hånd er større end kortene på bordet - mindst 30 %, og den
+     vokser med skærmhøjden. Bordet får så det der er tilbage. */
+  --hand-card-h: clamp(140px, 16vh, 180px);
+  --hand-card-w: calc(var(--hand-card-h) * 0.7);
+  --radius: 8px;
+
+  --shadow-lo: 0 1px 3px rgba(0,0,0,.35);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.4);
+  --shadow-hi: 0 10px 28px rgba(0,0,0,.5);
+
+  --font-ui: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-card: "Georgia", "Times New Roman", serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: var(--font-ui);
+  color: var(--paper);
+  background: radial-gradient(circle at 50% 0%, #2a2118 0%, #17110c 60%, #0d0a07 100%);
+  overflow: hidden;
+}
+/* Topbaren tager den højde den har brug for, og resten går til spillet.
+   Så kan topbaren vokse på smalle skærme uden at noget ryger ud i bunden. */
+body { display: flex; flex-direction: column; }
+
+/* Radioknapper og afkrydsning i spillets farver i stedet for browserens blå */
+input[type="radio"], input[type="checkbox"] { accent-color: var(--gold); }
+
+.hidden { display: none !important; }
+
+/* =============================================================
+   TOPBAR
+   ============================================================= */
+#topbar {
+  flex: 0 0 auto;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, var(--wood-light), var(--wood));
+  border-bottom: 2px solid #2e1c0f;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  z-index: 40;
+}
+
+.logo {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-shadow: 0 1px 0 #000;
+}
+
+.contract-banner {
+  flex: 1;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--paper);
+  background: rgba(0,0,0,.28);
+  border: 1px solid rgba(226,181,63,.4);
+  border-radius: 999px;
+  padding: 5px 16px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.topbar-actions { margin-left: auto; display: flex; gap: 8px; }
+
+/* =============================================================
+   KNAPPER
+   ============================================================= */
+.btn {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08);
+  color: var(--paper);
+  cursor: pointer;
+  transition: transform .08s ease, background .15s ease, box-shadow .15s ease;
+}
+.btn:hover  { background: rgba(255,255,255,.18); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .38; cursor: not-allowed; }
+
+.btn-primary {
+  background: linear-gradient(180deg, var(--gold), var(--gold-dim));
+  border-color: #6d5518;
+  color: #24190a;
+  text-shadow: 0 1px 0 rgba(255,255,255,.3);
+}
+.btn-primary:hover { filter: brightness(1.08); background: linear-gradient(180deg, var(--gold), var(--gold-dim)); }
+
+.btn-danger { background: rgba(217,83,79,.85); border-color: #8d2f2c; }
+.btn-ghost  { background: rgba(0,0,0,.22); }
+
+/* Meldeknapper */
+.bid-grid {
+  display: grid;
+  grid-template-columns: 64px repeat(4, 1fr);
+  gap: 6px;
+  align-items: center;
+}
+.bid-grid .bid-rowhead {
+  font-weight: 700; color: var(--gold); font-size: 14px; text-align: right; padding-right: 6px;
+}
+.bid-grid .bid-colhead {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: .7; text-align: center;
+}
+.bid-btn {
+  font-size: 12px; font-weight: 700; padding: 7px 4px; border-radius: 5px;
+  border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.07);
+  color: var(--paper); cursor: pointer;
+}
+.bid-btn:hover:not(:disabled) { background: var(--accent); color: #04202e; }
+.bid-btn:disabled { opacity: .2; cursor: not-allowed; }
+
+.special-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 2px; }
+.special-row .bid-btn { padding: 7px 6px; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.bid-special small { font-size: 10.5px; font-weight: 600; opacity: .7; }
+
+/* Meldingerne indtil nu, som små mærkater over gitteret */
+.bid-history { display: flex; flex-wrap: wrap; gap: 6px; }
+.bid-chip {
+  font-size: 12px; padding: 3px 9px; border-radius: 999px;
+  background: rgba(226,181,63,.14); border: 1px solid rgba(226,181,63,.35);
+}
+.bid-chip b { font-weight: 700; color: var(--gold); }
+.bid-chip.is-pass { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); opacity: .7; }
+.bid-chip.is-pass b { color: var(--paper); }
+
+/* =============================================================
+   LAYOUT
+   ============================================================= */
+#layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+#table-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 14px 14px 8px;
+}
+
+/* =============================================================
+   SPILLEBORDET
+   ============================================================= */
+#table {
+  position: relative;
+  flex: 1;
+  /* Bordet får højden der er tilbage efter hånden, men aldrig mere end
+     1,8 gange så bredt - ellers bliver det en lang grøn flade på brede
+     skærme. Det centreres over hånden, der stadig må bruge hele bredden. */
+  aspect-ratio: 1.8;
+  max-width: 100%;
+  align-self: center;
+  border-radius: 180px / 120px;
+  background:
+    radial-gradient(ellipse at 50% 42%, var(--felt-light) 0%, var(--felt) 52%, var(--felt-dark) 100%);
+  border: 12px solid var(--wood);
+  box-shadow:
+    inset 0 0 60px rgba(0,0,0,.55),
+    0 12px 34px rgba(0,0,0,.6);
+  min-height: 320px;
+}
+
+/* Sæder */
+.seat {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: opacity .3s ease;
+}
+.seat-north { top: 12px;  left: 50%; transform: translateX(-50%); }
+.seat-west  { left: 14px; top: 50%;  transform: translateY(-50%); }
+.seat-east  { right: 14px; top: 50%; transform: translateY(-50%); }
+.seat-extra { top: 12px;  right: 12%; }
+
+.seat-plate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 118px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(0,0,0,.42);
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: var(--shadow-lo);
+  transition: box-shadow .2s ease, border-color .2s ease, background .2s ease;
+}
+.seat-plate .seat-name { font-weight: 700; font-size: 13px; letter-spacing: .4px; }
+.seat-plate .seat-meta { font-size: 11px; opacity: .78; min-height: 14px; }
+
+/* Markeringer på sædet */
+.seat.is-turn    .seat-plate { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(226,181,63,.4), 0 0 18px rgba(226,181,63,.45); }
+.seat.is-dealer  .seat-plate::after  { content: "GIVER";  font-size: 9px; letter-spacing: 1px; color: var(--gold); }
+.seat.is-host    .seat-plate::before { content: "VÆRT";   font-size: 9px; letter-spacing: 1px; color: var(--accent); }
+.seat.is-declarer .seat-plate { background: rgba(226,181,63,.24); border-color: rgba(226,181,63,.6); }
+.seat[data-role="makker"] .seat-plate { background: rgba(226,181,63,.12); border-color: rgba(226,181,63,.45); }
+
+/* Antal kort vises kun på små skærme, hvor bagsiderne er skjult */
+.meta-cards { display: none; }
+
+/* Botten regner */
+.seat.is-thinking .seat-plate {
+  animation: think-pulse 1.1s ease-in-out infinite;
+  border-color: var(--accent);
+}
+.seat.is-thinking .seat-plate .seat-meta::after {
+  content: " · tænker…";
+  color: var(--accent);
+}
+@keyframes think-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(63,169,226,0); }
+  50%      { box-shadow: 0 0 0 3px rgba(63,169,226,.3), 0 0 16px rgba(63,169,226,.35); }
+}
+
+/* Hænder */
+.hand { display: flex; align-items: center; }
+
+/* Bot-hænder (kortbagsider): en tæt vifte under navnet på alle tre pladser.
+   De lodrette stabler i siderne gemte navnet bag kortene. */
+.hand-bot { display: flex; }
+.hand-bot .card-back { margin-left: -34px; }
+.hand-bot .card-back:first-child { margin-left: 0; }
+
+/* Åben hånd (misère): rang og kulør skal kunne læses, og siderne brydes over to linjer */
+.hand-bot.is-open { flex-wrap: wrap; justify-content: center; row-gap: 4px; padding-left: 22px; }
+.hand-bot.is-open .card { margin-left: -22px; }
+.seat-west .hand-bot.is-open, .seat-east .hand-bot.is-open { max-width: 220px; }
+
+/* =============================================================
+   KORT
+   ============================================================= */
+.card {
+  position: relative;
+  width: var(--card-w);
+  height: var(--card-h);
+  border-radius: var(--radius);
+  background: linear-gradient(160deg, #ffffff 0%, var(--paper) 55%, var(--paper-dim) 100%);
+  border: 1px solid #b9b9ac;
+  box-shadow: var(--shadow-md);
+  font-family: var(--font-card);
+  color: var(--black);
+  user-select: none;
+  flex: 0 0 auto;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+.card.red,
+.card.red .corner,
+.card.red .corner .r,
+.card.red .corner .s,
+.card.red .pips,
+.card.red .pip-mark,
+.card.red .court-letter,
+.card.red .court-suit { color: var(--red); }
+
+.card .corner {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  font-weight: 700;
+}
+/* Hjørnerne skalerer med kortet (15/13 px ved standardstørrelsen) */
+.card .corner .r { font-size: calc(var(--card-w) * 0.2); }
+.card .corner .s { font-size: calc(var(--card-w) * 0.176); }
+.card .corner.tl { top: 5px; left: 6px; }
+.card .corner.br { bottom: 5px; right: 6px; transform: rotate(180deg); }
+
+/* --- Midterfeltet med pips ---------------------------------- */
+.card .pips {
+  position: absolute;
+  inset: 13% 17%;
+}
+.card .pip-mark {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: var(--pip-size);
+  line-height: 1;
+}
+.card .pip-mark.flip { transform: translate(-50%, -50%) rotate(180deg); }
+
+/* Esset får ét stort kulørtegn i midten, som på et rigtigt kort */
+.card .pips.ace .pip-mark { font-size: calc(var(--card-w) * 0.46); }
+
+/* Klædekort: rammet figurfelt med bogstav og kulør */
+.card .pips.court-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card .court-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  height: 96%;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  background: rgba(0,0,0,.03);
+}
+.card .court-letter {
+  font-size: calc(var(--card-w) * 0.36);
+  font-weight: 700;
+  line-height: 1;
+}
+.card .court-suit {
+  font-size: calc(var(--card-w) * 0.2);
+  line-height: 1;
+}
+
+/* Joker */
+.card .joker-mark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--card-w) * 0.42);
+}
+
+/* Joker */
+.card.joker {
+  background: linear-gradient(150deg, #fff8e1 0%, #f3e3b3 60%, #e6cf90 100%);
+  color: #6c2b8a;
+  border-color: #c8ae6a;
+}
+.card.joker .corner .r { font-size: calc(var(--card-w) * 0.15); letter-spacing: 1px; }
+
+/* Kortbagside med guldkant */
+.card-back {
+  position: relative;
+  width: var(--card-w);
+  height: var(--card-h);
+  border-radius: var(--radius);
+  border: 2px solid var(--gold-dim);
+  background:
+    repeating-linear-gradient(45deg, #1e3a63 0 6px, #16294a 6px 12px);
+  box-shadow:
+    inset 0 0 0 1px rgba(226,181,63,.5),
+    inset 0 0 14px rgba(0,0,0,.45),
+    var(--shadow-lo);
+  flex: 0 0 auto;
+}
+/* Indvendig guldramme, så bagsiden ligner et rigtigt kort */
+.card-back::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(226,181,63,.45);
+  border-radius: 4px;
+  pointer-events: none;
+}
+.card-sm.card-back::after { inset: 3px; }
+
+/* Mindre kort i bot-hænder og kat */
+.card-sm { --card-w: 46px; --card-h: 66px; --pip-size: calc(var(--card-w) * 0.23); }
+.card-sm .corner .r { font-size: 10px; }
+.card-sm .corner .s { font-size: 9px; }
+.card-sm .pips { inset: 15% 14%; }
+
+/* =============================================================
+   EGEN HÅND
+   ============================================================= */
+/* Navneskiltet står i midten med tippet "Din tur ..." ved siden af, så
+   tippet aldrig skubber hånden op og ned. */
+.seat-south {
+  position: relative;          /* uden z-index: ingen stacking context, se kig-tilstand */
+  transform: none;
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-areas: ". plate hint" "hand hand hand";
+  align-items: center;
+  column-gap: 12px;
+}
+.seat-south .seat-plate { grid-area: plate; }
+.seat-south .turn-hint  { grid-area: hint; justify-self: start; }
+.seat-south .hand-mine  { grid-area: hand; }
+
+.turn-hint {
+  max-width: 100%;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #24190a;
+  background: linear-gradient(180deg, var(--gold), var(--gold-dim));
+  padding: 5px 14px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 3px rgba(226,181,63,.2), var(--shadow-md);
+  animation: hint-pop .25s cubic-bezier(.2,.9,.3,1.3);
+}
+@keyframes hint-pop { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+
+.hand-mine {
+  /* Egen kortstørrelse: alt på kortet (hjørner, pips, billedkort) følger med */
+  --card-w: var(--hand-card-w);
+  --card-h: var(--hand-card-h);
+  --pip-size: calc(var(--hand-card-w) * 0.21);
+  display: flex;
+  justify-content: center;
+  padding: 14px 4px 2px;       /* plads til at spilbare kort løftes */
+  min-height: calc(var(--card-h) + 24px);
+  min-width: 0;
+}
+/* Overlappet sættes af ui.js (fitHand), så hånden altid kan være der */
+.hand-mine .card { margin-left: var(--hand-overlap, -22px); cursor: default; }
+.hand-mine .card:first-child { margin-left: 0; }
+
+.hand-mine .card.playable { cursor: pointer; }
+.hand-mine.is-waiting .card.playable { transform: translateY(-8px); box-shadow: 0 0 0 2px rgba(226,181,63,.7), var(--shadow-hi); }
+.hand-mine .card.playable:hover { transform: translateY(-18px); box-shadow: 0 0 0 2px var(--gold), var(--shadow-hi); z-index: 5; }
+/* Kort du ikke må spille dæmpes - men uden gråtoning, så hjerter og ruder
+   stadig er røde og kan skelnes fra spar og klør. */
+.hand-mine .card.blocked { filter: brightness(.58) saturate(.9); }
+.hand-mine .card.selected { transform: translateY(-16px); box-shadow: 0 0 0 3px var(--accent), var(--shadow-hi); z-index: 6; }
+
+/* =============================================================
+   STIKOMRÅDE
+   ============================================================= */
+#trick-area {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px; height: 220px;
+}
+.trick-slot {
+  position: absolute;
+  width: var(--card-w); height: var(--card-h);
+}
+.trick-slot[data-slot="north"] { top: 0;    left: 50%; transform: translateX(-50%); }
+.trick-slot[data-slot="south"] { bottom: 0; left: 50%; transform: translateX(-50%); }
+.trick-slot[data-slot="west"]  { left: 0;   top: 50%;  transform: translateY(-50%); }
+.trick-slot[data-slot="east"]  { right: 0;  top: 50%;  transform: translateY(-50%); }
+.trick-slot[data-slot="extra"] { top: 6px;  right: 4px; }
+
+/* =============================================================
+   OVERBLIK I BORDETS HJØRNE
+   Stik, trumf og spilførerens mål står altid fremme - også mens der
+   ligger kort i stikket, hvor den gamle trumfmarkør forsvandt.
+   ============================================================= */
+.table-hud {
+  position: absolute;
+  left: 34px; top: 26px;
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 8px 12px;
+  min-width: 150px;
+  border-radius: 10px;
+  background: rgba(0,0,0,.38);
+  border: 1px solid rgba(226,181,63,.3);
+  box-shadow: var(--shadow-lo);
+  pointer-events: none;
+  z-index: 2;
+}
+.hud-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 12px; }
+.hud-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; opacity: .65; }
+.hud-value { font-weight: 700; white-space: nowrap; }
+.hud-suit { font-size: 14px; }
+.hud-suit.red { color: #ff7b6e; }
+
+/* ♥ og ♦ i tekst (topbar, log, beskeder, dialoger). Lysere end kortenes rød,
+   så det kan læses på den mørke baggrund. */
+.suit-red { color: #ff7b6e; }
+.hud-row.is-good .hud-value { color: #7ee08a; }
+.hud-row.is-bad  .hud-value { color: #ff8b82; }
+.hud-note { font-size: 10.5px; opacity: .6; text-align: right; }
+
+/* =============================================================
+   KATTEN + BUNKE
+   ============================================================= */
+.kitty {
+  position: absolute;
+  left: 20px; bottom: 16px;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.kitty-label { font-size: 10px; letter-spacing: 2px; opacity: .65; text-transform: uppercase; }
+.kitty-cards { display: flex; gap: 5px; min-height: 66px; }
+.kitty-cards .card-back { width: var(--card-w); height: var(--card-h); }
+
+/* =============================================================
+   TOAST PÅ BORDET
+   Nederst på filten, hvor den ikke dækker stikket eller nordens kort.
+   ============================================================= */
+.table-toast {
+  position: absolute;
+  left: 50%; bottom: 18px;
+  transform: translateX(-50%);
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.72);
+  border: 1px solid rgba(226,181,63,.5);
+  color: var(--gold);
+  font-weight: 700;
+  letter-spacing: .6px;
+  box-shadow: var(--shadow-md);
+  animation: toast-pop .28s ease;
+  z-index: 20;
+  white-space: nowrap;
+}
+
+/* =============================================================
+   SIDEPANEL
+   ============================================================= */
+#sidebar {
+  width: 320px;
+  flex: 0 0 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 14px 14px 0;
+  min-height: 0;
+}
+.panel {
+  background: rgba(0,0,0,.34);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow-lo);
+  min-height: 0;
+}
+.panel-grow { flex: 1; display: flex; flex-direction: column; }
+.panel-title {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.panel-title small { color: var(--paper); opacity: .5; letter-spacing: .4px; text-transform: none; font-size: 10px; }
+
+.table-scroll { max-height: 210px; overflow-y: auto; }
+
+/* Statuslinje for partiet */
+.match-status { margin: 0 0 10px; }
+.match-bar {
+  height: 5px; border-radius: 3px; overflow: hidden;
+  background: rgba(255,255,255,.1);
+}
+.match-bar-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+  transition: width .45s cubic-bezier(.2,.8,.3,1);
+}
+.match-text { margin-top: 5px; font-size: 11px; opacity: .72; letter-spacing: .2px; }
+
+/* Spillængde i opsætningen */
+.len-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.len-row input[type="number"] {
+  width: 96px; font-family: inherit; font-size: 14px; padding: 7px 9px;
+  border-radius: 6px; border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.3); color: var(--paper);
+}
+.len-unit { font-size: 13px; color: var(--gold); }
+.len-hint { font-size: 11px; opacity: .55; flex: 1 1 100%; }
+
+/* Slutskærm */
+.winner-line {
+  text-align: center; font-size: 20px; color: var(--gold);
+  margin: 4px 0 14px; letter-spacing: .4px;
+}
+.standings { width: 100%; border-collapse: collapse; font-size: 14px; }
+.standings th, .standings td { padding: 7px 9px; border-bottom: 1px solid rgba(255,255,255,.1); text-align: right; }
+.standings th:first-child, .standings td:first-child { text-align: left; }
+.standings tr.is-winner td { background: rgba(226,181,63,.14); font-weight: 700; }
+.standings tr.is-winner td:first-child::before { content: "★ "; color: var(--gold); }
+
+#scoreboard { width: 100%; border-collapse: collapse; font-size: 12px; }
+#scoreboard th, #scoreboard td { padding: 4px 5px; text-align: right; }
+#scoreboard th:first-child, #scoreboard td:first-child { text-align: left; opacity: .6; }
+#scoreboard thead th { border-bottom: 1px solid rgba(255,255,255,.18); font-size: 11px; color: var(--gold); }
+#scoreboard thead th.is-me { color: var(--paper); text-decoration: underline; text-underline-offset: 3px; }
+#scoreboard tfoot td { border-top: 1px solid rgba(255,255,255,.18); font-weight: 700; padding-top: 6px; }
+.pos { color: #7ee08a; }
+.neg { color: #ff8b82; }
+
+#log {
+  list-style: none;
+  margin: 0; padding: 0;
+  overflow-y: auto;
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.45;
+}
+#log li { padding: 3px 0; border-bottom: 1px dashed rgba(255,255,255,.07); }
+#log li.hl { color: var(--gold); font-weight: 600; }
+#log li.dim { opacity: .55; }
+
+/* =============================================================
+   OVERLAY / MODAL
+   ============================================================= */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4,8,6,.72);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fade-in .18s ease;
+}
+
+/* ---------------------------------------------------------------
+   Kig-tilstand: bruges når man skal melde, vælge trumf eller
+   makkeres. Dialogen rykker op i toppen, sløringen slås fra, og
+   egen hånd løftes op OVER overlayet, så kortene står helt skarpt.
+   --------------------------------------------------------------- */
+.overlay.peek {
+  background: rgba(4,8,6,.55);
+  backdrop-filter: none;
+  align-items: flex-start;
+  padding: 16px 16px 0;
+}
+.overlay.peek .modal {
+  /* Dialogen må ikke gå ind over hånden, der nu er større */
+  max-height: calc(100vh - var(--hand-card-h) - 120px);
+  animation: modal-drop .22s cubic-bezier(.2,.9,.3,1.15);
+}
+@keyframes modal-drop {
+  from { opacity: 0; transform: translateY(-18px) scale(.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Hånden løftes fri af overlayet og får en ramme, så den er let at læse */
+body.peeking #south-seat {
+  position: relative;
+  z-index: 130;
+  background: linear-gradient(180deg, rgba(8,26,18,.55), rgba(8,26,18,.9));
+  border: 1px solid rgba(226,181,63,.35);
+  border-radius: 14px;
+  padding: 4px 10px 8px;
+  box-shadow: 0 -6px 30px rgba(0,0,0,.6);
+}
+body.peeking #south-seat::before {
+  content: "Din hånd";
+  grid-area: 1 / 1;              /* venstre for navneskiltet, så hånden ikke rykker */
+  justify-self: end;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: .8;
+}
+
+/* Opslag (regler) ligger over spillets dialoger og rører dem ikke */
+.info-overlay { z-index: 150; }
+body.peeking #my-hand .card { box-shadow: var(--shadow-hi); }
+
+/* Meldegitteret pakkes tættere, så der bliver plads til kortene nedenunder */
+.overlay.peek .modal { padding: 16px 20px 14px; }
+.overlay.peek .modal-body { gap: 9px; }
+.overlay.peek .modal-actions { margin-top: 12px; }
+.overlay.peek .bid-grid { gap: 5px; }
+.overlay.peek .bid-btn { padding: 5px 3px; font-size: 11.5px; }
+.overlay.peek .special-row .bid-btn { padding: 5px 5px; }
+.overlay.peek .modal-text { margin-bottom: 8px; }
+.modal {
+  width: min(620px, 92vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #1d2c22, #14201a);
+  border: 1px solid rgba(226,181,63,.35);
+  border-radius: 12px;
+  padding: 22px 24px;
+  box-shadow: var(--shadow-hi);
+  animation: modal-in .22s cubic-bezier(.2,.9,.3,1.2);
+}
+.modal-title { margin: 0 0 6px; font-size: 18px; color: var(--gold); letter-spacing: .5px; }
+.modal-text  { margin: 0 0 14px; font-size: 13px; line-height: 1.55; opacity: .85; }
+.modal-body  { display: flex; flex-direction: column; gap: 12px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+
+.field { display: flex; flex-direction: column; gap: 6px; border: 0; padding: 0; margin: 0; font-size: 12px; }
+.field > span { opacity: .75; letter-spacing: .4px; }
+.field input[type="text"] {
+  font-family: inherit; font-size: 14px; padding: 8px 10px;
+  border-radius: 6px; border: 1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.3); color: var(--paper);
+}
+.radio-row { display: flex; gap: 16px; font-size: 13px; }
+.radio-row.radio-col { flex-direction: column; gap: 7px; }
+.radio-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+/* Kortvalg inde i modal (fx makkeres / bytte) */
+.card-picker { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.card-picker .card { cursor: pointer; }
+.card-picker .card:hover { transform: translateY(-8px); box-shadow: var(--shadow-hi); }
+.card-picker .card.selected { box-shadow: 0 0 0 3px var(--accent), var(--shadow-hi); transform: translateY(-8px); }
+
+.suit-picker { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.suit-btn {
+  width: 84px; padding: 8px 4px 7px; border-radius: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-family: inherit;
+  border: 1px solid rgba(255,255,255,.2); background: var(--paper); color: var(--black);
+  cursor: pointer; transition: transform .12s ease, box-shadow .12s ease;
+}
+.suit-btn .suit-sym   { font-size: 30px; line-height: 1; }
+.suit-btn .suit-name  { font-size: 12px; font-weight: 700; color: var(--black); }
+.suit-btn .suit-count { font-size: 11px; color: #555; }
+
+/* Kort fra katten i byttedialogen */
+.card-picker .card.from-kitty { box-shadow: 0 0 0 2px rgba(226,181,63,.75), var(--shadow-md); }
+.kitty-badge {
+  position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%);
+  font-family: var(--font-ui); font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: #24190a;
+  background: var(--gold); padding: 1px 6px; border-radius: 999px;
+}
+.suit-btn.red { color: var(--red); }
+.suit-btn:hover:not(:disabled) { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.suit-btn:disabled { opacity: .25; cursor: not-allowed; }
+
+.exchange-zone {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 12px; border-radius: 8px;
+  background: rgba(0,0,0,.25); border: 1px dashed rgba(255,255,255,.16);
+}
+.zone-label { font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; opacity: .6; }
+
+.result-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.result-table th, .result-table td { padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.1); text-align: right; }
+.result-table th:first-child, .result-table td:first-child,
+.result-table th:nth-child(2), .result-table td:nth-child(2) { text-align: left; }
+.result-table tr.is-me td { background: rgba(226,181,63,.1); font-weight: 700; }
+
+.rules-body { font-size: 13px; line-height: 1.6; }
+.rules-body h4 { margin: 14px 0 4px; color: var(--gold); font-size: 13px; }
+.rules-body ul { margin: 0; padding-left: 18px; }
+
+/* =============================================================
+   ANIMATIONER
+   ============================================================= */
+@keyframes fade-in   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modal-in  { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes toast-pop { from { opacity: 0; transform: translateX(-50%) scale(.85); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
+
+/* Kort der lander i stikket */
+@keyframes card-drop {
+  from { opacity: 0; transform: translateY(-46px) scale(1.14) rotate(-6deg); }
+  to   { opacity: 1; transform: none; }
+}
+.trick-slot .card { animation: card-drop .26s cubic-bezier(.2,.8,.3,1.1); }
+
+/* Kort der vendes i katten (Vip-trumf) */
+@keyframes flip-in {
+  0%   { transform: rotateY(90deg) scale(.9); opacity: 0; }
+  60%  { transform: rotateY(-12deg) scale(1.06); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+.flip-in { animation: flip-in .42s ease both; }
+
+/* Bytteanimation: kort suges fra katten ind på hånden */
+@keyframes swap-in {
+  0%   { transform: translate(-140px, 90px) scale(.7) rotate(-14deg); opacity: 0; }
+  100% { transform: none; opacity: 1; }
+}
+.swap-in { animation: swap-in .5s cubic-bezier(.2,.85,.3,1.05) both; }
+
+@keyframes swap-out {
+  0%   { transform: none; opacity: 1; }
+  100% { transform: translate(-140px, 90px) scale(.7) rotate(14deg); opacity: 0; }
+}
+.swap-out { animation: swap-out .4s ease both; }
+
+/* Stikket samles op af vinderen */
+@keyframes trick-collect {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(.55); }
+}
+.collecting .trick-slot .card { animation: trick-collect .35s ease both; }
+
+/* Vinderkortet blinker kort */
+@keyframes win-glow {
+  0%, 100% { box-shadow: var(--shadow-md); }
+  50%      { box-shadow: 0 0 0 3px var(--gold), 0 0 22px rgba(226,181,63,.85); }
+}
+.trick-slot .card.winner { animation: win-glow .5s ease 2; }
+
+/* Uddeling */
+@keyframes deal-in {
+  from { opacity: 0; transform: translate(120px, 140px) scale(.5) rotate(20deg); }
+  to   { opacity: 1; transform: none; }
+}
+.deal-in { animation: deal-in .38s ease both; }
+
+/* =============================================================
+   RESPONSIVT
+   ============================================================= */
+@media (max-width: 1180px) {
+  :root { --card-w: 62px; --card-h: 90px; --pip-size: calc(var(--card-w) * 0.22); }
+  #sidebar { width: 260px; flex-basis: 260px; }
+}
+/* Lave skærme (laptop 1280×720 og 1366×768): mindre kort, så bordet ikke klemmes.
+   Hånden er stadig ~30 % større end kortene på bordet. */
+@media (max-height: 780px) and (min-width: 701px) {
+  :root {
+    --card-w: 62px; --card-h: 90px; --pip-size: calc(var(--card-w) * 0.22);
+    --hand-card-h: 118px;
+  }
+  .seat-south { margin-top: 4px; }
+  .seat-north { top: 6px; }
+  #trick-area { height: 196px; }
+}
+@media (max-width: 900px) {
+  #layout { flex-direction: column; }
+  #sidebar { width: auto; flex: 0 0 190px; padding: 0 14px 12px; flex-direction: row; }
+  .panel { flex: 1; }
+}
+
+/* =============================================================
+   MOBIL
+   Alt skal kunne nås med en tommelfinger: hele hånden på skærmen,
+   Pas-knappen fri af hånden, og intet der stikker ud i siden.
+   ============================================================= */
+@media (max-width: 700px) {
+  :root { --card-w: 50px; --card-h: 72px; --pip-size: calc(var(--card-w) * 0.22); --hand-card-h: 72px; }
+  .card .corner .r { font-size: 12px; }
+  .card .corner .s { font-size: 11px; }
+  .card-sm { --card-w: 34px; --card-h: 49px; }
+  .card-sm .corner .r { font-size: 9px; }
+  .card-sm .corner .s { font-size: 8px; }
+
+  /* Topbar: kontrakten får sin egen linje under logo og knapper */
+  #topbar { flex-wrap: wrap; gap: 6px 10px; padding: 6px 10px; min-height: 0; }
+  .logo { font-size: 15px; letter-spacing: 1.4px; }
+  .topbar-actions .btn { padding: 6px 10px; font-size: 12px; }
+  .contract-banner { order: 3; flex: 1 1 100%; max-width: none; font-size: 12px; padding: 4px 10px; }
+
+  #table-wrap { padding: 8px 8px 4px; }
+  #table { border-width: 8px; border-radius: 48px; min-height: 260px; }
+
+  /* Modspillerne: navn, stik og antal kort. Bagsiderne æder hele bordet. */
+  .hand-bot:not(.is-open) { display: none; }
+  .meta-cards { display: inline; }
+  .seat-plate { min-width: 0; padding: 4px 8px; }
+  .seat-plate .seat-name { font-size: 12px; }
+  .seat-plate .seat-meta { font-size: 10px; }
+  .seat-north { top: 8px; }
+  .seat-west  { left: 6px; }
+  .seat-east  { right: 6px; }
+  .seat-west .hand-bot.is-open, .seat-east .hand-bot.is-open { max-width: 110px; }
+
+  #trick-area { width: 180px; height: 170px; }
+
+  .table-hud { left: 12px; top: 10px; min-width: 0; padding: 5px 8px; gap: 1px; }
+  .hud-row { font-size: 11px; gap: 8px; }
+  .hud-label { font-size: 9px; }
+  .hud-note { display: none; }
+
+  .kitty { left: 12px; bottom: 10px; }
+  .kitty-label { font-size: 9px; }
+  .table-toast { font-size: 13px; padding: 7px 14px; bottom: 10px; }
+
+  /* Egen hånd: navneskiltet til venstre og tippet ved siden af */
+  .seat-south {
+    grid-template-columns: auto 1fr;
+    grid-template-areas: "plate hint" "hand hand";
+    column-gap: 8px;
+    margin-top: 6px;
+  }
+  .seat-south .seat-plate { min-height: 44px; }
+  .turn-hint { font-size: 12px; padding: 4px 10px; border-radius: 12px; }
+
+  /* Meldepanel: kun tallet på knapperne - kolonnen siger typen */
+  .bid-grid { grid-template-columns: 26px repeat(4, 1fr); gap: 5px; }
+  .bid-v { display: none; }
+  .bid-grid .bid-colhead { font-size: 9px; letter-spacing: .2px; }
+  .bid-btn { font-size: 13px; padding: 8px 2px; }
+  .special-row { grid-template-columns: repeat(2, 1fr); }
+  .modal { padding: 16px 14px; }
+  .modal-title { font-size: 17px; }
+  .suit-btn { width: 72px; }
+
+  /* Kig-tilstand: hånden står fast i bunden, og dialogen må ikke gå ind under den */
+  body.peeking #south-seat {
+    position: fixed; left: 6px; right: 6px; bottom: 6px; margin: 0;
+    background: rgba(8,26,18,.97);       /* regnskabet bagved må ikke skinne igennem */
+  }
+  body.peeking #south-seat::before { display: none; }
+  .overlay.peek { padding: 8px 8px 0; }
+  .overlay.peek .modal { max-height: calc(100vh - var(--hand-card-h) - 130px); }
+
+  #sidebar { flex-basis: 150px; padding: 0 8px 8px; gap: 8px; }
+}

@@ -1,0 +1,5 @@
+Kasino/node_modules/
+Kasino/dist/
+node_modules/
+dist/
+.DS_Store
