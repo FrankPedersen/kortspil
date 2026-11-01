@@ -9,9 +9,9 @@ Forside og fælles indgang til to danske kortspil:
 
 Når GitHub Pages-udgivelsen er gennemført:
 
-- Forside: <https://frankpedersen.github.io/kortspil/>
-- Es Makker: <https://frankpedersen.github.io/kortspil/es-makker/>
-- Kasino: <https://frankpedersen.github.io/kortspil/kasino/>
+- Forside: <https://www.kontraktbridge.dk/kortspil/>
+- Es Makker: <https://www.kontraktbridge.dk/kortspil/es-makker/>
+- Kasino: <https://www.kontraktbridge.dk/kortspil/kasino/>
 
 ## Kør lokalt
 
