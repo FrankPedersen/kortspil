@@ -1556,172 +1556,347 @@
                           "type": "array",
                           "items": {
                             "type": "object",
-                            "required": [
-                              "id",
-                              "suit",
-                              "value",
-                              "displayName",
-                              "symbol",
-                              "name",
-                              "buildAs",
-                              "captureAs",
-                              "boardAs",
-                              "isSweeper"
-                            ],
-                            "properties": {
-                              "id": {
-                                "type": "string"
+                            "allOf": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "suit",
+                                  "value",
+                                  "displayName",
+                                  "symbol",
+                                  "name",
+                                  "buildAs",
+                                  "captureAs",
+                                  "boardAs",
+                                  "isSweeper"
+                                ],
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "suit": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "enum": [
+                                          "SPADES"
+                                        ]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": [
+                                          "HEARTS"
+                                        ]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": [
+                                          "DIAMONDS"
+                                        ]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": [
+                                          "CLUBS"
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  "value": {
+                                    "minimum": 1,
+                                    "maximum": 13,
+                                    "type": "integer"
+                                  },
+                                  "displayName": {
+                                    "type": "string"
+                                  },
+                                  "symbol": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "buildAs": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "captureAs": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "boardAs": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "isSweeper": {
+                                    "type": "boolean"
+                                  }
+                                }
                               },
-                              "suit": {
-                                "anyOf": [
-                                  {
-                                    "type": "string",
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "isBuild": {
+                                    "type": "boolean",
                                     "enum": [
-                                      "SPADES"
-                                    ]
-                                  },
-                                  {
-                                    "type": "string",
-                                    "enum": [
-                                      "HEARTS"
-                                    ]
-                                  },
-                                  {
-                                    "type": "string",
-                                    "enum": [
-                                      "DIAMONDS"
-                                    ]
-                                  },
-                                  {
-                                    "type": "string",
-                                    "enum": [
-                                      "CLUBS"
+                                      false
                                     ]
                                   }
-                                ]
-                              },
-                              "value": {
-                                "minimum": 1,
-                                "maximum": 13,
-                                "type": "integer"
-                              },
-                              "displayName": {
-                                "type": "string"
-                              },
-                              "symbol": {
-                                "type": "string"
-                              },
-                              "name": {
-                                "type": "string"
-                              },
-                              "buildAs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "integer"
                                 }
-                              },
-                              "captureAs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "integer"
-                                }
-                              },
-                              "boardAs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "integer"
-                                }
-                              },
-                              "isSweeper": {
-                                "type": "boolean"
                               }
-                            }
+                            ]
                           }
                         },
                         "board": {
                           "type": "array",
                           "items": {
-                            "type": "object",
-                            "required": [
-                              "id",
-                              "suit",
-                              "value",
-                              "displayName",
-                              "symbol",
-                              "name",
-                              "buildAs",
-                              "captureAs",
-                              "boardAs",
-                              "isSweeper"
-                            ],
-                            "properties": {
-                              "id": {
-                                "type": "string"
-                              },
-                              "suit": {
-                                "anyOf": [
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "allOf": [
                                   {
-                                    "type": "string",
-                                    "enum": [
-                                      "SPADES"
-                                    ]
+                                    "type": "object",
+                                    "required": [
+                                      "id",
+                                      "suit",
+                                      "value",
+                                      "displayName",
+                                      "symbol",
+                                      "name",
+                                      "buildAs",
+                                      "captureAs",
+                                      "boardAs",
+                                      "isSweeper"
+                                    ],
+                                    "properties": {
+                                      "id": {
+                                        "type": "string"
+                                      },
+                                      "suit": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string",
+                                            "enum": [
+                                              "SPADES"
+                                            ]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": [
+                                              "HEARTS"
+                                            ]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": [
+                                              "DIAMONDS"
+                                            ]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": [
+                                              "CLUBS"
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      "value": {
+                                        "minimum": 1,
+                                        "maximum": 13,
+                                        "type": "integer"
+                                      },
+                                      "displayName": {
+                                        "type": "string"
+                                      },
+                                      "symbol": {
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "buildAs": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "captureAs": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "boardAs": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "isSweeper": {
+                                        "type": "boolean"
+                                      }
+                                    }
                                   },
                                   {
-                                    "type": "string",
-                                    "enum": [
-                                      "HEARTS"
-                                    ]
-                                  },
-                                  {
-                                    "type": "string",
-                                    "enum": [
-                                      "DIAMONDS"
-                                    ]
-                                  },
-                                  {
-                                    "type": "string",
-                                    "enum": [
-                                      "CLUBS"
-                                    ]
+                                    "type": "object",
+                                    "properties": {
+                                      "isBuild": {
+                                        "type": "boolean",
+                                        "enum": [
+                                          false
+                                        ]
+                                      }
+                                    }
                                   }
                                 ]
                               },
-                              "value": {
-                                "minimum": 1,
-                                "maximum": 13,
-                                "type": "integer"
-                              },
-                              "displayName": {
-                                "type": "string"
-                              },
-                              "symbol": {
-                                "type": "string"
-                              },
-                              "name": {
-                                "type": "string"
-                              },
-                              "buildAs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "integer"
+                              {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "isBuild",
+                                  "groups",
+                                  "value",
+                                  "owner",
+                                  "cards"
+                                ],
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "isBuild": {
+                                    "type": "boolean",
+                                    "enum": [
+                                      true
+                                    ]
+                                  },
+                                  "groups": {
+                                    "minimum": 1,
+                                    "maximum": 52,
+                                    "type": "integer"
+                                  },
+                                  "value": {
+                                    "minimum": 1,
+                                    "type": "integer"
+                                  },
+                                  "owner": {
+                                    "minimum": 0,
+                                    "maximum": 3,
+                                    "type": "integer"
+                                  },
+                                  "cards": {
+                                    "minItems": 2,
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "allOf": [
+                                        {
+                                          "type": "object",
+                                          "required": [
+                                            "id",
+                                            "suit",
+                                            "value",
+                                            "displayName",
+                                            "symbol",
+                                            "name",
+                                            "buildAs",
+                                            "captureAs",
+                                            "boardAs",
+                                            "isSweeper"
+                                          ],
+                                          "properties": {
+                                            "id": {
+                                              "type": "string"
+                                            },
+                                            "suit": {
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "SPADES"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "HEARTS"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "DIAMONDS"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "CLUBS"
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            "value": {
+                                              "minimum": 1,
+                                              "maximum": 13,
+                                              "type": "integer"
+                                            },
+                                            "displayName": {
+                                              "type": "string"
+                                            },
+                                            "symbol": {
+                                              "type": "string"
+                                            },
+                                            "name": {
+                                              "type": "string"
+                                            },
+                                            "buildAs": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "integer"
+                                              }
+                                            },
+                                            "captureAs": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "integer"
+                                              }
+                                            },
+                                            "boardAs": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "integer"
+                                              }
+                                            },
+                                            "isSweeper": {
+                                              "type": "boolean"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "isBuild": {
+                                              "type": "boolean",
+                                              "enum": [
+                                                false
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
                                 }
-                              },
-                              "captureAs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "integer"
-                                }
-                              },
-                              "boardAs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "integer"
-                                }
-                              },
-                              "isSweeper": {
-                                "type": "boolean"
                               }
-                            }
+                            ]
                           }
                         },
                         "captured": {
@@ -1730,86 +1905,102 @@
                             "type": "array",
                             "items": {
                               "type": "object",
-                              "required": [
-                                "id",
-                                "suit",
-                                "value",
-                                "displayName",
-                                "symbol",
-                                "name",
-                                "buildAs",
-                                "captureAs",
-                                "boardAs",
-                                "isSweeper"
-                              ],
-                              "properties": {
-                                "id": {
-                                  "type": "string"
+                              "allOf": [
+                                {
+                                  "type": "object",
+                                  "required": [
+                                    "id",
+                                    "suit",
+                                    "value",
+                                    "displayName",
+                                    "symbol",
+                                    "name",
+                                    "buildAs",
+                                    "captureAs",
+                                    "boardAs",
+                                    "isSweeper"
+                                  ],
+                                  "properties": {
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "suit": {
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "enum": [
+                                            "SPADES"
+                                          ]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": [
+                                            "HEARTS"
+                                          ]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": [
+                                            "DIAMONDS"
+                                          ]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": [
+                                            "CLUBS"
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    "value": {
+                                      "minimum": 1,
+                                      "maximum": 13,
+                                      "type": "integer"
+                                    },
+                                    "displayName": {
+                                      "type": "string"
+                                    },
+                                    "symbol": {
+                                      "type": "string"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "buildAs": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "captureAs": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "boardAs": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "isSweeper": {
+                                      "type": "boolean"
+                                    }
+                                  }
                                 },
-                                "suit": {
-                                  "anyOf": [
-                                    {
-                                      "type": "string",
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "isBuild": {
+                                      "type": "boolean",
                                       "enum": [
-                                        "SPADES"
-                                      ]
-                                    },
-                                    {
-                                      "type": "string",
-                                      "enum": [
-                                        "HEARTS"
-                                      ]
-                                    },
-                                    {
-                                      "type": "string",
-                                      "enum": [
-                                        "DIAMONDS"
-                                      ]
-                                    },
-                                    {
-                                      "type": "string",
-                                      "enum": [
-                                        "CLUBS"
+                                        false
                                       ]
                                     }
-                                  ]
-                                },
-                                "value": {
-                                  "minimum": 1,
-                                  "maximum": 13,
-                                  "type": "integer"
-                                },
-                                "displayName": {
-                                  "type": "string"
-                                },
-                                "symbol": {
-                                  "type": "string"
-                                },
-                                "name": {
-                                  "type": "string"
-                                },
-                                "buildAs": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "integer"
                                   }
-                                },
-                                "captureAs": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "integer"
-                                  }
-                                },
-                                "boardAs": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "integer"
-                                  }
-                                },
-                                "isSweeper": {
-                                  "type": "boolean"
                                 }
-                              }
+                              ]
                             }
                           }
                         },
@@ -2294,172 +2485,347 @@
                           "type": "array",
                           "items": {
                             "type": "object",
-                            "required": [
-                              "id",
-                              "suit",
-                              "value",
-                              "displayName",
-                              "symbol",
-                              "name",
-                              "buildAs",
-                              "captureAs",
-                              "boardAs",
-                              "isSweeper"
-                            ],
-                            "properties": {
-                              "id": {
-                                "type": "string"
+                            "allOf": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "suit",
+                                  "value",
+                                  "displayName",
+                                  "symbol",
+                                  "name",
+                                  "buildAs",
+                                  "captureAs",
+                                  "boardAs",
+                                  "isSweeper"
+                                ],
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "suit": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "enum": [
+                                          "SPADES"
+                                        ]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": [
+                                          "HEARTS"
+                                        ]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": [
+                                          "DIAMONDS"
+                                        ]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": [
+                                          "CLUBS"
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  "value": {
+                                    "minimum": 1,
+                                    "maximum": 13,
+                                    "type": "integer"
+                                  },
+                                  "displayName": {
+                                    "type": "string"
+                                  },
+                                  "symbol": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "buildAs": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "captureAs": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "boardAs": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "isSweeper": {
+                                    "type": "boolean"
+                                  }
+                                }
                               },
-                              "suit": {
-                                "anyOf": [
-                                  {
-                                    "type": "string",
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "isBuild": {
+                                    "type": "boolean",
                                     "enum": [
-                                      "SPADES"
-                                    ]
-                                  },
-                                  {
-                                    "type": "string",
-                                    "enum": [
-                                      "HEARTS"
-                                    ]
-                                  },
-                                  {
-                                    "type": "string",
-                                    "enum": [
-                                      "DIAMONDS"
-                                    ]
-                                  },
-                                  {
-                                    "type": "string",
-                                    "enum": [
-                                      "CLUBS"
+                                      false
                                     ]
                                   }
-                                ]
-                              },
-                              "value": {
-                                "minimum": 1,
-                                "maximum": 13,
-                                "type": "integer"
-                              },
-                              "displayName": {
-                                "type": "string"
-                              },
-                              "symbol": {
-                                "type": "string"
-                              },
-                              "name": {
-                                "type": "string"
-                              },
-                              "buildAs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "integer"
                                 }
-                              },
-                              "captureAs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "integer"
-                                }
-                              },
-                              "boardAs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "integer"
-                                }
-                              },
-                              "isSweeper": {
-                                "type": "boolean"
                               }
-                            }
+                            ]
                           }
                         },
                         "board": {
                           "type": "array",
                           "items": {
-                            "type": "object",
-                            "required": [
-                              "id",
-                              "suit",
-                              "value",
-                              "displayName",
-                              "symbol",
-                              "name",
-                              "buildAs",
-                              "captureAs",
-                              "boardAs",
-                              "isSweeper"
-                            ],
-                            "properties": {
-                              "id": {
-                                "type": "string"
-                              },
-                              "suit": {
-                                "anyOf": [
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "allOf": [
                                   {
-                                    "type": "string",
-                                    "enum": [
-                                      "SPADES"
-                                    ]
+                                    "type": "object",
+                                    "required": [
+                                      "id",
+                                      "suit",
+                                      "value",
+                                      "displayName",
+                                      "symbol",
+                                      "name",
+                                      "buildAs",
+                                      "captureAs",
+                                      "boardAs",
+                                      "isSweeper"
+                                    ],
+                                    "properties": {
+                                      "id": {
+                                        "type": "string"
+                                      },
+                                      "suit": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string",
+                                            "enum": [
+                                              "SPADES"
+                                            ]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": [
+                                              "HEARTS"
+                                            ]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": [
+                                              "DIAMONDS"
+                                            ]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": [
+                                              "CLUBS"
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      "value": {
+                                        "minimum": 1,
+                                        "maximum": 13,
+                                        "type": "integer"
+                                      },
+                                      "displayName": {
+                                        "type": "string"
+                                      },
+                                      "symbol": {
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "buildAs": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "captureAs": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "boardAs": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "isSweeper": {
+                                        "type": "boolean"
+                                      }
+                                    }
                                   },
                                   {
-                                    "type": "string",
-                                    "enum": [
-                                      "HEARTS"
-                                    ]
-                                  },
-                                  {
-                                    "type": "string",
-                                    "enum": [
-                                      "DIAMONDS"
-                                    ]
-                                  },
-                                  {
-                                    "type": "string",
-                                    "enum": [
-                                      "CLUBS"
-                                    ]
+                                    "type": "object",
+                                    "properties": {
+                                      "isBuild": {
+                                        "type": "boolean",
+                                        "enum": [
+                                          false
+                                        ]
+                                      }
+                                    }
                                   }
                                 ]
                               },
-                              "value": {
-                                "minimum": 1,
-                                "maximum": 13,
-                                "type": "integer"
-                              },
-                              "displayName": {
-                                "type": "string"
-                              },
-                              "symbol": {
-                                "type": "string"
-                              },
-                              "name": {
-                                "type": "string"
-                              },
-                              "buildAs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "integer"
+                              {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "isBuild",
+                                  "groups",
+                                  "value",
+                                  "owner",
+                                  "cards"
+                                ],
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "isBuild": {
+                                    "type": "boolean",
+                                    "enum": [
+                                      true
+                                    ]
+                                  },
+                                  "groups": {
+                                    "minimum": 1,
+                                    "maximum": 52,
+                                    "type": "integer"
+                                  },
+                                  "value": {
+                                    "minimum": 1,
+                                    "type": "integer"
+                                  },
+                                  "owner": {
+                                    "minimum": 0,
+                                    "maximum": 3,
+                                    "type": "integer"
+                                  },
+                                  "cards": {
+                                    "minItems": 2,
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "allOf": [
+                                        {
+                                          "type": "object",
+                                          "required": [
+                                            "id",
+                                            "suit",
+                                            "value",
+                                            "displayName",
+                                            "symbol",
+                                            "name",
+                                            "buildAs",
+                                            "captureAs",
+                                            "boardAs",
+                                            "isSweeper"
+                                          ],
+                                          "properties": {
+                                            "id": {
+                                              "type": "string"
+                                            },
+                                            "suit": {
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "SPADES"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "HEARTS"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "DIAMONDS"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "CLUBS"
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            "value": {
+                                              "minimum": 1,
+                                              "maximum": 13,
+                                              "type": "integer"
+                                            },
+                                            "displayName": {
+                                              "type": "string"
+                                            },
+                                            "symbol": {
+                                              "type": "string"
+                                            },
+                                            "name": {
+                                              "type": "string"
+                                            },
+                                            "buildAs": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "integer"
+                                              }
+                                            },
+                                            "captureAs": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "integer"
+                                              }
+                                            },
+                                            "boardAs": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "integer"
+                                              }
+                                            },
+                                            "isSweeper": {
+                                              "type": "boolean"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "isBuild": {
+                                              "type": "boolean",
+                                              "enum": [
+                                                false
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
                                 }
-                              },
-                              "captureAs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "integer"
-                                }
-                              },
-                              "boardAs": {
-                                "type": "array",
-                                "items": {
-                                  "type": "integer"
-                                }
-                              },
-                              "isSweeper": {
-                                "type": "boolean"
                               }
-                            }
+                            ]
                           }
                         },
                         "captured": {
@@ -2468,86 +2834,1339 @@
                             "type": "array",
                             "items": {
                               "type": "object",
-                              "required": [
-                                "id",
-                                "suit",
-                                "value",
-                                "displayName",
-                                "symbol",
-                                "name",
-                                "buildAs",
-                                "captureAs",
-                                "boardAs",
-                                "isSweeper"
-                              ],
-                              "properties": {
-                                "id": {
-                                  "type": "string"
+                              "allOf": [
+                                {
+                                  "type": "object",
+                                  "required": [
+                                    "id",
+                                    "suit",
+                                    "value",
+                                    "displayName",
+                                    "symbol",
+                                    "name",
+                                    "buildAs",
+                                    "captureAs",
+                                    "boardAs",
+                                    "isSweeper"
+                                  ],
+                                  "properties": {
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "suit": {
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "enum": [
+                                            "SPADES"
+                                          ]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": [
+                                            "HEARTS"
+                                          ]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": [
+                                            "DIAMONDS"
+                                          ]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": [
+                                            "CLUBS"
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    "value": {
+                                      "minimum": 1,
+                                      "maximum": 13,
+                                      "type": "integer"
+                                    },
+                                    "displayName": {
+                                      "type": "string"
+                                    },
+                                    "symbol": {
+                                      "type": "string"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "buildAs": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "captureAs": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "boardAs": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "isSweeper": {
+                                      "type": "boolean"
+                                    }
+                                  }
                                 },
-                                "suit": {
-                                  "anyOf": [
-                                    {
-                                      "type": "string",
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "isBuild": {
+                                      "type": "boolean",
                                       "enum": [
-                                        "SPADES"
-                                      ]
-                                    },
-                                    {
-                                      "type": "string",
-                                      "enum": [
-                                        "HEARTS"
-                                      ]
-                                    },
-                                    {
-                                      "type": "string",
-                                      "enum": [
-                                        "DIAMONDS"
-                                      ]
-                                    },
-                                    {
-                                      "type": "string",
-                                      "enum": [
-                                        "CLUBS"
+                                        false
                                       ]
                                     }
-                                  ]
-                                },
-                                "value": {
-                                  "minimum": 1,
-                                  "maximum": 13,
-                                  "type": "integer"
-                                },
-                                "displayName": {
-                                  "type": "string"
-                                },
-                                "symbol": {
-                                  "type": "string"
-                                },
-                                "name": {
-                                  "type": "string"
-                                },
-                                "buildAs": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "integer"
                                   }
-                                },
-                                "captureAs": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "integer"
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        "sweeps": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "minimum": 0,
+                            "type": "integer"
+                          }
+                        },
+                        "scores": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "minimum": 0,
+                            "type": "integer"
+                          }
+                        },
+                        "lastTaker": {
+                          "anyOf": [
+                            {
+                              "minimum": 0,
+                              "maximum": 3,
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "winner": {
+                          "anyOf": [
+                            {
+                              "minimum": 0,
+                              "maximum": 3,
+                              "type": "integer"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "gameType",
+                        "version",
+                        "phase",
+                        "roundNumber",
+                        "dealerSeat",
+                        "currentBidderSeat",
+                        "players",
+                        "mySeat",
+                        "hand",
+                        "handCounts",
+                        "kittyCount",
+                        "bids"
+                      ],
+                      "properties": {
+                        "gameType": {
+                          "type": "string",
+                          "enum": [
+                            "es-makker"
+                          ]
+                        },
+                        "version": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "phase": {
+                          "type": "string",
+                          "enum": [
+                            "bidding"
+                          ]
+                        },
+                        "roundNumber": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "dealerSeat": {
+                          "minimum": 0,
+                          "maximum": 3,
+                          "type": "integer"
+                        },
+                        "currentBidderSeat": {
+                          "minimum": 0,
+                          "maximum": 3,
+                          "type": "integer"
+                        },
+                        "players": {
+                          "minItems": 4,
+                          "maxItems": 4,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "seatNumber",
+                              "kind",
+                              "handCount"
+                            ],
+                            "properties": {
+                              "seatNumber": {
+                                "minimum": 0,
+                                "maximum": 3,
+                                "type": "integer"
+                              },
+                              "kind": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "human"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "bot"
+                                    ]
                                   }
-                                },
-                                "boardAs": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "integer"
+                                ]
+                              },
+                              "handCount": {
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        },
+                        "mySeat": {
+                          "minimum": 0,
+                          "maximum": 3,
+                          "type": "integer"
+                        },
+                        "hand": {
+                          "minItems": 13,
+                          "maxItems": 13,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "suit",
+                              "rank",
+                              "jokerNo",
+                              "isJoker"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "suit": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "clubs"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "diamonds"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "hearts"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "spades"
+                                    ]
+                                  },
+                                  {
+                                    "type": "null"
                                   }
-                                },
-                                "isSweeper": {
-                                  "type": "boolean"
+                                ]
+                              },
+                              "rank": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "jokerNo": {
+                                "minimum": -1,
+                                "maximum": 2,
+                                "type": "integer"
+                              },
+                              "isJoker": {
+                                "type": "boolean"
+                              }
+                            }
+                          }
+                        },
+                        "handCounts": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "minimum": 0,
+                            "type": "integer"
+                          }
+                        },
+                        "kittyCount": {
+                          "minimum": 0,
+                          "maximum": 3,
+                          "type": "integer"
+                        },
+                        "bids": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "seatNumber",
+                              "kind"
+                            ],
+                            "properties": {
+                              "seatNumber": {
+                                "minimum": 0,
+                                "maximum": 3,
+                                "type": "integer"
+                              },
+                              "kind": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "pass"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "bid"
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tables/{tableId}/move-options": {
+      "post": {
+        "summary": "Preview legal Kasino moves for the current player.",
+        "tags": [
+          "games"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "handCardId",
+                  "targetItemIds"
+                ],
+                "properties": {
+                  "handCardId": {
+                    "minLength": 1,
+                    "maxLength": 32,
+                    "type": "string"
+                  },
+                  "targetItemIds": {
+                    "maxItems": 52,
+                    "type": "array",
+                    "items": {
+                      "minLength": 1,
+                      "maxLength": 64,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "tableId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "type"
+                    ],
+                    "properties": {
+                      "type": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "SPAR_FEM"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "SMID_UD"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "STIK"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "BYG_ENKELT"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "BYG_DOBBELT"
+                            ]
+                          }
+                        ]
+                      },
+                      "buildValue": {
+                        "type": "integer"
+                      },
+                      "groupCount": {
+                        "minimum": 1,
+                        "maximum": 52,
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tables/{tableId}/turns": {
+      "post": {
+        "summary": "Play a server-validated Kasino turn.",
+        "tags": [
+          "games"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "type": "object",
+                "required": [
+                  "expectedVersion",
+                  "action"
+                ],
+                "properties": {
+                  "expectedVersion": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "action": {
+                    "additionalProperties": false,
+                    "type": "object",
+                    "required": [
+                      "type",
+                      "handCardId",
+                      "targetItemIds"
+                    ],
+                    "properties": {
+                      "type": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "SPAR_FEM"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "SMID_UD"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "STIK"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "BYG_ENKELT"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "BYG_DOBBELT"
+                            ]
+                          }
+                        ]
+                      },
+                      "handCardId": {
+                        "minLength": 1,
+                        "maxLength": 32,
+                        "type": "string"
+                      },
+                      "targetItemIds": {
+                        "maxItems": 52,
+                        "type": "array",
+                        "items": {
+                          "minLength": 1,
+                          "maxLength": 64,
+                          "type": "string"
+                        }
+                      },
+                      "buildValue": {
+                        "type": "integer"
+                      },
+                      "groupCount": {
+                        "minimum": 1,
+                        "maximum": 52,
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "in": "path",
+            "name": "tableId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "gameType",
+                        "version",
+                        "phase",
+                        "roundNumber",
+                        "turnSeat",
+                        "players",
+                        "mySeat",
+                        "hand",
+                        "board",
+                        "captured",
+                        "sweeps",
+                        "scores",
+                        "lastTaker",
+                        "winner"
+                      ],
+                      "properties": {
+                        "gameType": {
+                          "type": "string",
+                          "enum": [
+                            "kasino"
+                          ]
+                        },
+                        "version": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "phase": {
+                          "type": "string",
+                          "enum": [
+                            "playing"
+                          ]
+                        },
+                        "roundNumber": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "turnSeat": {
+                          "minimum": 0,
+                          "maximum": 3,
+                          "type": "integer"
+                        },
+                        "players": {
+                          "minItems": 2,
+                          "maxItems": 4,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "seatNumber",
+                              "kind",
+                              "handCount"
+                            ],
+                            "properties": {
+                              "seatNumber": {
+                                "minimum": 0,
+                                "maximum": 3,
+                                "type": "integer"
+                              },
+                              "kind": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "human"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": [
+                                      "bot"
+                                    ]
+                                  }
+                                ]
+                              },
+                              "handCount": {
+                                "minimum": 0,
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        },
+                        "mySeat": {
+                          "minimum": 0,
+                          "maximum": 3,
+                          "type": "integer"
+                        },
+                        "hand": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "allOf": [
+                              {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "suit",
+                                  "value",
+                                  "displayName",
+                                  "symbol",
+                                  "name",
+                                  "buildAs",
+                                  "captureAs",
+                                  "boardAs",
+                                  "isSweeper"
+                                ],
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "suit": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string",
+                                        "enum": [
+                                          "SPADES"
+                                        ]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": [
+                                          "HEARTS"
+                                        ]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": [
+                                          "DIAMONDS"
+                                        ]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": [
+                                          "CLUBS"
+                                        ]
+                                      }
+                                    ]
+                                  },
+                                  "value": {
+                                    "minimum": 1,
+                                    "maximum": 13,
+                                    "type": "integer"
+                                  },
+                                  "displayName": {
+                                    "type": "string"
+                                  },
+                                  "symbol": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "buildAs": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "captureAs": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "boardAs": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "isSweeper": {
+                                    "type": "boolean"
+                                  }
+                                }
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "isBuild": {
+                                    "type": "boolean",
+                                    "enum": [
+                                      false
+                                    ]
+                                  }
                                 }
                               }
+                            ]
+                          }
+                        },
+                        "board": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "allOf": [
+                                  {
+                                    "type": "object",
+                                    "required": [
+                                      "id",
+                                      "suit",
+                                      "value",
+                                      "displayName",
+                                      "symbol",
+                                      "name",
+                                      "buildAs",
+                                      "captureAs",
+                                      "boardAs",
+                                      "isSweeper"
+                                    ],
+                                    "properties": {
+                                      "id": {
+                                        "type": "string"
+                                      },
+                                      "suit": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string",
+                                            "enum": [
+                                              "SPADES"
+                                            ]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": [
+                                              "HEARTS"
+                                            ]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": [
+                                              "DIAMONDS"
+                                            ]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": [
+                                              "CLUBS"
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      "value": {
+                                        "minimum": 1,
+                                        "maximum": 13,
+                                        "type": "integer"
+                                      },
+                                      "displayName": {
+                                        "type": "string"
+                                      },
+                                      "symbol": {
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "buildAs": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "captureAs": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "boardAs": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "isSweeper": {
+                                        "type": "boolean"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "isBuild": {
+                                        "type": "boolean",
+                                        "enum": [
+                                          false
+                                        ]
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "object",
+                                "required": [
+                                  "id",
+                                  "isBuild",
+                                  "groups",
+                                  "value",
+                                  "owner",
+                                  "cards"
+                                ],
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "isBuild": {
+                                    "type": "boolean",
+                                    "enum": [
+                                      true
+                                    ]
+                                  },
+                                  "groups": {
+                                    "minimum": 1,
+                                    "maximum": 52,
+                                    "type": "integer"
+                                  },
+                                  "value": {
+                                    "minimum": 1,
+                                    "type": "integer"
+                                  },
+                                  "owner": {
+                                    "minimum": 0,
+                                    "maximum": 3,
+                                    "type": "integer"
+                                  },
+                                  "cards": {
+                                    "minItems": 2,
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "allOf": [
+                                        {
+                                          "type": "object",
+                                          "required": [
+                                            "id",
+                                            "suit",
+                                            "value",
+                                            "displayName",
+                                            "symbol",
+                                            "name",
+                                            "buildAs",
+                                            "captureAs",
+                                            "boardAs",
+                                            "isSweeper"
+                                          ],
+                                          "properties": {
+                                            "id": {
+                                              "type": "string"
+                                            },
+                                            "suit": {
+                                              "anyOf": [
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "SPADES"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "HEARTS"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "DIAMONDS"
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "string",
+                                                  "enum": [
+                                                    "CLUBS"
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            "value": {
+                                              "minimum": 1,
+                                              "maximum": 13,
+                                              "type": "integer"
+                                            },
+                                            "displayName": {
+                                              "type": "string"
+                                            },
+                                            "symbol": {
+                                              "type": "string"
+                                            },
+                                            "name": {
+                                              "type": "string"
+                                            },
+                                            "buildAs": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "integer"
+                                              }
+                                            },
+                                            "captureAs": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "integer"
+                                              }
+                                            },
+                                            "boardAs": {
+                                              "type": "array",
+                                              "items": {
+                                                "type": "integer"
+                                              }
+                                            },
+                                            "isSweeper": {
+                                              "type": "boolean"
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "isBuild": {
+                                              "type": "boolean",
+                                              "enum": [
+                                                false
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "captured": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "allOf": [
+                                {
+                                  "type": "object",
+                                  "required": [
+                                    "id",
+                                    "suit",
+                                    "value",
+                                    "displayName",
+                                    "symbol",
+                                    "name",
+                                    "buildAs",
+                                    "captureAs",
+                                    "boardAs",
+                                    "isSweeper"
+                                  ],
+                                  "properties": {
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "suit": {
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "enum": [
+                                            "SPADES"
+                                          ]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": [
+                                            "HEARTS"
+                                          ]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": [
+                                            "DIAMONDS"
+                                          ]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": [
+                                            "CLUBS"
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    "value": {
+                                      "minimum": 1,
+                                      "maximum": 13,
+                                      "type": "integer"
+                                    },
+                                    "displayName": {
+                                      "type": "string"
+                                    },
+                                    "symbol": {
+                                      "type": "string"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    },
+                                    "buildAs": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "captureAs": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "boardAs": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "integer"
+                                      }
+                                    },
+                                    "isSweeper": {
+                                      "type": "boolean"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "isBuild": {
+                                      "type": "boolean",
+                                      "enum": [
+                                        false
+                                      ]
+                                    }
+                                  }
+                                }
+                              ]
                             }
                           }
                         },

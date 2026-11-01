@@ -16,7 +16,7 @@ const StoredPlayerSchema = Type.Object({
   handCount: Type.Integer({ minimum: 0 }),
 });
 
-const CasinoCardSchema = Type.Object({
+const CasinoCardFaceSchema = Type.Object({
   id: Type.String(),
   suit: Type.Union([
     Type.Literal('SPADES'),
@@ -33,6 +33,24 @@ const CasinoCardSchema = Type.Object({
   boardAs: Type.Array(Type.Integer()),
   isSweeper: Type.Boolean(),
 });
+
+const CasinoCardSchema = Type.Intersect([
+  CasinoCardFaceSchema,
+  Type.Object({
+    isBuild: Type.Optional(Type.Literal(false)),
+  }),
+]);
+
+const KasinoBuildSchema = Type.Object({
+  id: Type.String(),
+  isBuild: Type.Literal(true),
+  groups: Type.Integer({ minimum: 1, maximum: 52 }),
+  value: Type.Integer({ minimum: 1 }),
+  owner: Type.Integer({ minimum: 0, maximum: 3 }),
+  cards: Type.Array(CasinoCardSchema, { minItems: 2 }),
+});
+
+const KasinoBoardItemSchema = Type.Union([CasinoCardSchema, KasinoBuildSchema]);
 
 const EsMakkerCardSchema = Type.Object({
   id: Type.String(),
@@ -57,11 +75,12 @@ const KasinoStoredStateSchema = Type.Object({
   players: Type.Array(StoredPlayerSchema, { minItems: 2, maxItems: 4 }),
   deck: Type.Array(CasinoCardSchema),
   hands: Type.Record(Type.String(), Type.Array(CasinoCardSchema)),
-  board: Type.Array(CasinoCardSchema),
+  board: Type.Array(KasinoBoardItemSchema),
   lastTaker: Type.Union([Type.Integer({ minimum: 0, maximum: 3 }), Type.Null()]),
   captured: Type.Record(Type.String(), Type.Array(CasinoCardSchema)),
   sweeps: Type.Record(Type.String(), Type.Integer({ minimum: 0 })),
   scores: Type.Record(Type.String(), Type.Integer({ minimum: 0 })),
+  baselineScores: Type.Optional(Type.Record(Type.String(), Type.Integer({ minimum: 0 }))),
   winner: Type.Union([Type.Integer({ minimum: 0, maximum: 3 }), Type.Null()]),
 });
 
@@ -87,6 +106,8 @@ export const MultiplayerGameStateSchema = Type.Union([
 ]);
 
 export type MultiplayerGameState = Static<typeof MultiplayerGameStateSchema>;
+export type KasinoGameState = Extract<MultiplayerGameState, { gameType: 'kasino' }>;
+export type KasinoCard = Static<typeof CasinoCardSchema>;
 
 const KasinoSnapshotSchema = Type.Object({
   gameType: Type.Literal('kasino'),
@@ -97,7 +118,7 @@ const KasinoSnapshotSchema = Type.Object({
   players: Type.Array(PublicPlayerSchema, { minItems: 2, maxItems: 4 }),
   mySeat: Type.Integer({ minimum: 0, maximum: 3 }),
   hand: Type.Array(CasinoCardSchema),
-  board: Type.Array(CasinoCardSchema),
+  board: Type.Array(KasinoBoardItemSchema),
   captured: Type.Record(Type.String(), Type.Array(CasinoCardSchema)),
   sweeps: Type.Record(Type.String(), Type.Integer({ minimum: 0 })),
   scores: Type.Record(Type.String(), Type.Integer({ minimum: 0 })),
@@ -241,6 +262,7 @@ function createKasinoState(seats: GameSeat[]): MultiplayerGameState {
     captured,
     sweeps,
     scores,
+    baselineScores: { ...scores },
     winner: null,
   };
 }
@@ -365,5 +387,4 @@ function shuffle<T>(cards: T[]): T[] {
   return shuffled;
 }
 
-type KasinoCard = Static<typeof CasinoCardSchema>;
 type EsMakkerCard = Static<typeof EsMakkerCardSchema>;

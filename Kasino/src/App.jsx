@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Multiplayer from './Multiplayer.jsx';
 
 /* ================================================================== */
 /*  KONSTANTER                                                        */
@@ -900,7 +901,7 @@ const DEFAULT_SEATS = [
   { slot: 'right',  active: true, type: 'bot',   name: 'Robot 3', level: 'let' }
 ];
 
-export default function App() {
+function SoloKasino() {
   const [screen, setScreen]   = useState('LOBBY');
   const [seats, setSeats]     = useState(DEFAULT_SEATS);
   const [players, setPlayers] = useState([]);
@@ -1881,4 +1882,9 @@ export default function App() {
       )}
     </>
   );
+}
+
+export default function App() {
+  const tableId = new URLSearchParams(window.location.search).get('table');
+  return tableId ? <Multiplayer tableId={tableId} /> : <SoloKasino />;
 }

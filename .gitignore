@@ -2,4 +2,5 @@ Kasino/node_modules/
 Kasino/dist/
 node_modules/
 dist/
+backend/public/kasino/
 .DS_Store

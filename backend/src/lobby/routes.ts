@@ -11,6 +11,7 @@ import {
   type LobbyRepository,
 } from './types.js';
 import { GameSnapshotSchema } from '../game/state.js';
+import type { KasinoActionType } from '../game/kasino-engine.js';
 
 const ErrorResponse = Type.Object({ message: Type.String() });
 const ErrorResponses = {
@@ -237,6 +238,91 @@ export async function registerLobbyRoutes(
     if (!principal) return reply;
     const { tableId } = request.params as { tableId: string };
     const snapshot = await repository.getGameSnapshot(tableId, principal.subject);
+    reply.header('Cache-Control', 'no-store');
+    return snapshot;
+  });
+
+  app.post('/api/v1/tables/:tableId/move-options', {
+    config: { rateLimit: { max: 60, timeWindow: '1 minute' } },
+    schema: {
+      tags: ['games'],
+      summary: 'Preview legal Kasino moves for the current player.',
+      params: Type.Object({ tableId: Type.String({ format: 'uuid' }) }),
+      body: Type.Object({
+        handCardId: Type.String({ minLength: 1, maxLength: 32 }),
+        targetItemIds: Type.Array(Type.String({ minLength: 1, maxLength: 64 }), { maxItems: 52 }),
+      }, { additionalProperties: false }),
+      response: {
+        200: Type.Array(Type.Object({
+          type: Type.Union([
+            Type.Literal('SPAR_FEM'),
+            Type.Literal('SMID_UD'),
+            Type.Literal('STIK'),
+            Type.Literal('BYG_ENKELT'),
+            Type.Literal('BYG_DOBBELT'),
+          ]),
+          buildValue: Type.Optional(Type.Integer()),
+          groupCount: Type.Optional(Type.Integer({ minimum: 1, maximum: 52 })),
+        })),
+        ...ErrorResponses,
+      },
+    },
+  }, async (request, reply) => {
+    const principal = getPrincipal(request, reply, options);
+    if (!principal) return reply;
+    const { tableId } = request.params as { tableId: string };
+    const { handCardId, targetItemIds } = request.body as {
+      handCardId: string;
+      targetItemIds: string[];
+    };
+    reply.header('Cache-Control', 'no-store');
+    return repository.getKasinoMoveOptions(tableId, principal.subject, handCardId, targetItemIds);
+  });
+
+  app.post('/api/v1/tables/:tableId/turns', {
+    config: { rateLimit: { max: 30, timeWindow: '1 minute' } },
+    schema: {
+      tags: ['games'],
+      summary: 'Play a server-validated Kasino turn.',
+      params: Type.Object({ tableId: Type.String({ format: 'uuid' }) }),
+      body: Type.Object({
+        expectedVersion: Type.Integer({ minimum: 1 }),
+        action: Type.Object({
+          type: Type.Union([
+            Type.Literal('SPAR_FEM'),
+            Type.Literal('SMID_UD'),
+            Type.Literal('STIK'),
+            Type.Literal('BYG_ENKELT'),
+            Type.Literal('BYG_DOBBELT'),
+          ]),
+          handCardId: Type.String({ minLength: 1, maxLength: 32 }),
+          targetItemIds: Type.Array(Type.String({ minLength: 1, maxLength: 64 }), { maxItems: 52 }),
+          buildValue: Type.Optional(Type.Integer()),
+          groupCount: Type.Optional(Type.Integer({ minimum: 1, maximum: 52 })),
+        }, { additionalProperties: false }),
+      }, { additionalProperties: false }),
+      response: { 200: GameSnapshotSchema, ...ErrorResponses },
+    },
+  }, async (request, reply) => {
+    const principal = getPrincipal(request, reply, options);
+    if (!principal) return reply;
+    const { tableId } = request.params as { tableId: string };
+    const { expectedVersion, action } = request.body as {
+      expectedVersion: number;
+      action: {
+        type: KasinoActionType;
+        handCardId: string;
+        targetItemIds: string[];
+        buildValue?: number;
+        groupCount?: number;
+      };
+    };
+    const snapshot = await repository.playKasinoTurn(
+      tableId,
+      principal.subject,
+      expectedVersion,
+      action,
+    );
     reply.header('Cache-Control', 'no-store');
     return snapshot;
   });

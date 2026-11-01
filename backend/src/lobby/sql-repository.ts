@@ -6,6 +6,11 @@ import {
   type GameSeat,
 } from '../game/state.js';
 import { LobbyError, type CreateTableInput, type LobbyRepository, type TableSummary, type VipRequestSummary } from './types.js';
+import {
+  applyKasinoAction,
+  getKasinoMoveOptions,
+  type KasinoTurnAction,
+} from '../game/kasino-engine.js';
 
 interface DatabaseTableRow {
   TableId: string;
@@ -510,6 +515,9 @@ export class SqlLobbyRepository implements LobbyRepository {
       const table = tableResult.recordset[0];
       if (!table) throw new LobbyError(404, 'Table not found.');
       if (table.Status !== 'waiting') throw new LobbyError(409, 'The table is not waiting to start.');
+      if (table.GameType === 'kasino' && table.BotSeatCount > 0) {
+        throw new LobbyError(409, 'Online Kasino currently requires human players in every seat.');
+      }
 
       const seatsResult = await new sql.Request(transaction)
         .input('tableId', sql.UniqueIdentifier, tableId)
@@ -576,6 +584,96 @@ export class SqlLobbyRepository implements LobbyRepository {
     if (!row) throw new LobbyError(403, 'You do not occupy a seat at this table.');
     if (!row.StateJson) throw new LobbyError(409, 'The game has not started.');
     return createGameSnapshot(parseGameState(row.StateJson, row.GameType), userSubject);
+  }
+
+  async getKasinoMoveOptions(
+    tableId: string,
+    userSubject: string,
+    handCardId: string,
+    targetItemIds: string[],
+  ) {
+    const result = await this.pool.request()
+      .input('tableId', sql.UniqueIdentifier, tableId)
+      .input('userSubject', sql.NVarChar(300), userSubject)
+      .query<{ GameType: string; Status: string; StateJson: string | null; SeatNumber: number }>(`
+        SELECT t.GameType, t.Status, t.StateJson, s.SeatNumber
+        FROM dbo.GameTables t
+        INNER JOIN dbo.GameSeats s ON s.TableId = t.TableId AND s.IsActive = 1
+        WHERE t.TableId = @tableId AND s.UserSubject = @userSubject;
+      `);
+    const row = result.recordset[0];
+    if (!row) throw new LobbyError(403, 'You do not occupy a seat at this table.');
+    if (row.GameType !== 'kasino' || row.Status !== 'active' || !row.StateJson) {
+      throw new LobbyError(409, 'This Kasino game is not active.');
+    }
+    const state = parseGameState(row.StateJson, 'kasino');
+    if (state.gameType !== 'kasino') {
+      throw new LobbyError(409, 'Stored game state does not match the Kasino table.');
+    }
+    return getKasinoMoveOptions(state, row.SeatNumber, handCardId, targetItemIds);
+  }
+
+  async playKasinoTurn(
+    tableId: string,
+    userSubject: string,
+    expectedVersion: number,
+    action: KasinoTurnAction,
+  ) {
+    const transaction = new sql.Transaction(this.pool);
+    await transaction.begin(sql.ISOLATION_LEVEL.SERIALIZABLE);
+    try {
+      const result = await new sql.Request(transaction)
+        .input('tableId', sql.UniqueIdentifier, tableId)
+        .input('userSubject', sql.NVarChar(300), userSubject)
+        .query<{
+          GameType: string;
+          Status: string;
+          StateJson: string | null;
+          SeatNumber: number;
+          StateVersion: number;
+        }>(`
+          SELECT t.GameType, t.Status, t.StateJson, t.StateVersion, s.SeatNumber
+          FROM dbo.GameTables t WITH (UPDLOCK, HOLDLOCK)
+          INNER JOIN dbo.GameSeats s WITH (UPDLOCK, HOLDLOCK)
+            ON s.TableId = t.TableId AND s.IsActive = 1
+          WHERE t.TableId = @tableId AND s.UserSubject = @userSubject;
+        `);
+      const row = result.recordset[0];
+      if (!row) throw new LobbyError(403, 'You do not occupy a seat at this table.');
+      if (row.GameType !== 'kasino' || row.Status !== 'active' || !row.StateJson) {
+        throw new LobbyError(409, 'This Kasino game is not active.');
+      }
+      if (row.StateVersion !== expectedVersion) {
+        throw new LobbyError(409, 'The game changed. Refresh the table and try again.');
+      }
+      const state = parseGameState(row.StateJson, 'kasino');
+      if (state.gameType !== 'kasino') {
+        throw new LobbyError(409, 'Stored game state does not match the Kasino table.');
+      }
+      const nextState = applyKasinoAction(state, row.SeatNumber, expectedVersion, action);
+      const status = nextState.winner === null ? 'active' : 'finished';
+      const updated = await new sql.Request(transaction)
+        .input('tableId', sql.UniqueIdentifier, tableId)
+        .input('stateJson', sql.NVarChar(sql.MAX), JSON.stringify(nextState))
+        .input('stateVersion', sql.BigInt, nextState.version)
+        .input('status', sql.VarChar(12), status)
+        .query(`
+          UPDATE dbo.GameTables
+          SET StateJson = @stateJson,
+              StateVersion = @stateVersion,
+              Status = @status,
+              LastActivityAt = SYSUTCDATETIME()
+          WHERE TableId = @tableId AND Status = 'active';
+        `);
+      if (updated.rowsAffected.reduce((total, count) => total + count, 0) !== 1) {
+        throw new LobbyError(409, 'The game changed while the move was being saved.');
+      }
+      await transaction.commit();
+      return createGameSnapshot(nextState, userSubject);
+    } catch (error) {
+      await rollbackPreservingError(transaction);
+      throw error;
+    }
   }
 
 }

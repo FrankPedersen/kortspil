@@ -6,6 +6,11 @@ import {
   type MultiplayerGameState,
 } from '../game/state.js';
 import {
+  applyKasinoAction,
+  getKasinoMoveOptions,
+  type KasinoTurnAction,
+} from '../game/kasino-engine.js';
+import {
   LobbyError,
   type CreateTableInput,
   type LobbyRepository,
@@ -232,6 +237,9 @@ export class MemoryLobbyRepository implements LobbyRepository {
   async startGame(tableId: string, ownerSubject: string) {
     const table = this.getOwnedTable(tableId, ownerSubject);
     if (table.status !== 'waiting') throw new LobbyError(409, 'The table is not waiting to start.');
+    if (table.gameType === 'kasino' && table.botSeatCount > 0) {
+      throw new LobbyError(409, 'Online Kasino currently requires human players in every seat.');
+    }
     if (table.seats.some(subject => subject.length === 0)) {
       throw new LobbyError(409, 'All human seats must be occupied before the game starts.');
     }
@@ -260,9 +268,39 @@ export class MemoryLobbyRepository implements LobbyRepository {
     if (!table.seats.includes(userSubject)) {
       throw new LobbyError(403, 'You do not occupy a seat at this table.');
     }
-    if (!table.gameState || table.status !== 'active') {
+    if (!table.gameState || !['active', 'finished'].includes(table.status)) {
       throw new LobbyError(409, 'The game has not started.');
     }
+    return createGameSnapshot(table.gameState, userSubject);
+  }
+
+  async getKasinoMoveOptions(
+    tableId: string,
+    userSubject: string,
+    handCardId: string,
+    targetItemIds: string[],
+  ) {
+    const table = this.getActiveTable(tableId, userSubject);
+    if (!table.gameState || table.gameState.gameType !== 'kasino') {
+      throw new LobbyError(409, 'This Kasino game is not active.');
+    }
+    const seatNumber = table.seats.indexOf(userSubject);
+    return getKasinoMoveOptions(table.gameState, seatNumber, handCardId, targetItemIds);
+  }
+
+  async playKasinoTurn(
+    tableId: string,
+    userSubject: string,
+    expectedVersion: number,
+    action: KasinoTurnAction,
+  ) {
+    const table = this.getActiveTable(tableId, userSubject);
+    if (!table.gameState || table.gameState.gameType !== 'kasino') {
+      throw new LobbyError(409, 'This table is not a Kasino game.');
+    }
+    const seatNumber = table.seats.indexOf(userSubject);
+    table.gameState = applyKasinoAction(table.gameState, seatNumber, expectedVersion, action);
+    if (table.gameState.winner !== null) table.status = 'finished';
     return createGameSnapshot(table.gameState, userSubject);
   }
 
@@ -278,6 +316,18 @@ export class MemoryLobbyRepository implements LobbyRepository {
     const table = this.tables.get(tableId);
     if (!table) throw new LobbyError(404, 'Table not found.');
     if (table.ownerSubject !== ownerSubject) throw new LobbyError(403, 'Only the table host can perform this action.');
+    return table;
+  }
+
+  private getActiveTable(tableId: string, userSubject: string): StoredTable {
+    const table = this.tables.get(tableId);
+    if (!table) throw new LobbyError(404, 'Game table not found.');
+    if (!table.seats.includes(userSubject)) {
+      throw new LobbyError(403, 'You do not occupy a seat at this table.');
+    }
+    if (!table.gameState || table.status !== 'active') {
+      throw new LobbyError(409, 'This game is not active.');
+    }
     return table;
   }
 

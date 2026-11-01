@@ -14,6 +14,10 @@ in `../infra`.
 ```powershell
 cd backend
 npm ci
+cd ..\Kasino
+npm ci
+npm run build
+cd ..\backend
 npm run dev
 ```
 
@@ -31,13 +35,19 @@ VIP requests/administration. Mutations require the configured same-origin
 `VIP_ADMIN_USER_IDS` is a comma-separated list of trusted App Service subject
 IDs; it is not populated from client claims.
 
-The first server-owned game lifecycle slice is available through
-`POST /api/v1/tables/{tableId}/start` and `GET /api/v1/tables/{tableId}/state`.
-Starting requires the host and all configured human seats; the backend shuffles
-and deals both games, stores the initial state, and returns a player-specific
-snapshot suitable for reconnecting. Opponents' hands and Es Makker's kitty are
-never included. Turn actions, scoring, and bot decision-making are not yet
-implemented in the backend.
+Kasino can be played online at `/kasino/?table={tableId}`. The host starts a
+full table from `/lobby/`; players receive only their own hands, and legal
+Kasino actions are checked and persisted by the API. Turns use state versions
+to reject stale submissions. Online Kasino currently requires 2-4 human
+players; bots are not supported. Es Makker can be listed in the lobby, but its
+online game flow is not connected yet.
+
+To build the Kasino client for the API's same-origin route, run
+`npm run build` in `Kasino/`. The Vite build copies its `/kasino/` assets into
+`backend/public/kasino/`; include that directory when deploying the backend.
+Production startup fails if these assets are missing. The standard GitHub
+Pages build overrides the base path and does not copy Pages assets into the
+API directory.
 
 Local development uses an in-memory repository and is not durable. Production
 always uses Azure SQL and fails startup if SQL configuration is missing; there

@@ -490,3 +490,125 @@ test('a host cannot start a table while requested human seats are still empty', 
   });
   assert.equal(response.statusCode, 409);
 });
+
+test('Kasino turns are private, validated, and versioned', async () => {
+  const app = await createApp({
+    appServiceAuthEnabled: true,
+    lobbyRepository: new MemoryLobbyRepository(),
+  });
+  const hostHeaders = authHeaders('host');
+  const create = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tables',
+    headers: hostHeaders,
+    payload: {
+      gameType: 'kasino',
+      visibility: 'open',
+      humanSeatCount: 2,
+      botSeatCount: 0,
+    },
+  });
+  const tableId = create.json().id as string;
+  await app.inject({
+    method: 'POST',
+    url: `/api/v1/tables/${tableId}/requests`,
+    headers: authHeaders('player'),
+    payload: {},
+  });
+  const pending = await app.inject({
+    method: 'GET',
+    url: `/api/v1/tables/${tableId}/requests`,
+    headers: hostHeaders,
+  });
+  await app.inject({
+    method: 'PUT',
+    url: `/api/v1/seat-requests/${pending.json()[0].id}`,
+    headers: hostHeaders,
+    payload: { decision: 'accept' },
+  });
+  const start = await app.inject({
+    method: 'POST',
+    url: `/api/v1/tables/${tableId}/start`,
+    headers: hostHeaders,
+  });
+  assert.equal(start.statusCode, 200);
+  const hostSnapshot = start.json();
+  const playerHeaders = authHeaders('player');
+
+  const playerSnapshot = await app.inject({
+    method: 'GET',
+    url: `/api/v1/tables/${tableId}/state`,
+    headers: playerHeaders,
+  });
+  assert.equal(playerSnapshot.statusCode, 200);
+  assert.equal(playerSnapshot.json().hand.length, 4);
+  assert.equal('hands' in playerSnapshot.json(), false);
+  assert.equal('deck' in playerSnapshot.json(), false);
+
+  const handCardId = hostSnapshot.hand[0].id as string;
+  const preview = await app.inject({
+    method: 'POST',
+    url: `/api/v1/tables/${tableId}/move-options`,
+    headers: hostHeaders,
+    payload: { handCardId, targetItemIds: [] },
+  });
+  assert.equal(preview.statusCode, 200);
+  const option = preview.json()[0];
+  assert.ok(option);
+
+  const outOfTurn = await app.inject({
+    method: 'POST',
+    url: `/api/v1/tables/${tableId}/turns`,
+    headers: playerHeaders,
+    payload: {
+      expectedVersion: hostSnapshot.version,
+      action: { ...option, handCardId, targetItemIds: [] },
+    },
+  });
+  assert.equal(outOfTurn.statusCode, 409);
+
+  const illegal = await app.inject({
+    method: 'POST',
+    url: `/api/v1/tables/${tableId}/turns`,
+    headers: hostHeaders,
+    payload: {
+      expectedVersion: hostSnapshot.version,
+      action: { type: 'STIK', handCardId, targetItemIds: ['not-on-the-table'] },
+    },
+  });
+  assert.equal(illegal.statusCode, 400);
+
+  const played = await app.inject({
+    method: 'POST',
+    url: `/api/v1/tables/${tableId}/turns`,
+    headers: hostHeaders,
+    payload: {
+      expectedVersion: hostSnapshot.version,
+      action: { ...option, handCardId, targetItemIds: [] },
+    },
+  });
+  assert.equal(played.statusCode, 200);
+  assert.equal(played.json().version, hostSnapshot.version + 1);
+
+  const stale = await app.inject({
+    method: 'POST',
+    url: `/api/v1/tables/${tableId}/turns`,
+    headers: playerHeaders,
+    payload: {
+      expectedVersion: hostSnapshot.version,
+      action: {
+        type: 'SMID_UD',
+        handCardId: playerSnapshot.json().hand[0].id,
+        targetItemIds: [],
+      },
+    },
+  });
+  assert.equal(stale.statusCode, 409);
+  const refreshed = await app.inject({
+    method: 'GET',
+    url: `/api/v1/tables/${tableId}/state`,
+    headers: playerHeaders,
+  });
+  assert.equal(refreshed.json().version, played.json().version);
+  assert.equal(refreshed.json().turnSeat, 1);
+});

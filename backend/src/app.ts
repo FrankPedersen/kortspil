@@ -2,6 +2,7 @@ import Fastify, { type FastifyInstance, type FastifyReply } from 'fastify';
 import swagger from '@fastify/swagger';
 import fastifyStatic from '@fastify/static';
 import rateLimit from '@fastify/rate-limit';
+import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Type, type Static } from '@sinclair/typebox';
 import {
@@ -86,6 +87,19 @@ export async function buildApp(options: AppOptions = {}): Promise<FastifyInstanc
     index: ['index.html'],
     cacheControl: false,
   });
+  const kasinoAssets = resolve(process.cwd(), 'public', 'kasino');
+  if (process.env.NODE_ENV === 'production' && !existsSync(kasinoAssets)) {
+    throw new Error('The Kasino client must be built into backend/public/kasino before production startup.');
+  }
+  if (existsSync(kasinoAssets)) {
+    await app.register(fastifyStatic, {
+      root: kasinoAssets,
+      prefix: '/kasino/',
+      index: ['index.html'],
+      cacheControl: false,
+      decorateReply: false,
+    });
+  }
 
   app.addHook('onRequest', async (request, reply) => {
     if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) return;

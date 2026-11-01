@@ -65,16 +65,17 @@ function updateSeatOptions() {
   addOptions(humanSeats, humanOptions, Math.min(humanValue, maxPlayers));
 
   const minTotal = game === 'es-makker' ? 4 : 2;
-  const minBots = Math.max(0, minTotal - Number(humanSeats.value));
-  const maxBots = maxPlayers - Number(humanSeats.value);
+  const minBots = game === 'es-makker' ? Math.max(0, minTotal - Number(humanSeats.value)) : 0;
+  const maxBots = game === 'kasino' ? 0 : maxPlayers - Number(humanSeats.value);
   const botOptions = Array.from({ length: maxBots - minBots + 1 }, (_, index) => minBots + index);
   const selectedBots = Math.min(Math.max(botValue, minBots), maxBots);
   addOptions(botSeats, botOptions, selectedBots);
+  botSeats.disabled = game === 'kasino';
 
   if (game === 'es-makker') {
     seatHelp.textContent = 'Es Makker har altid fire pladser i alt. Ledige menneskepladser kan andre anmode om.';
   } else {
-    seatHelp.textContent = 'Kasino har 2-4 spillere i alt. Robotter udfylder de valgte resterende pladser.';
+    seatHelp.textContent = 'Online Kasino har 2-4 menneskelige spillere. Robotter er endnu ikke understøttet.';
   }
 }
 
@@ -167,6 +168,27 @@ function renderTable(table) {
         setMessage(error.message, true);
       }
     }));
+  }
+
+  if (table.isHost && table.status === 'waiting' && table.gameType === 'kasino') {
+    const ready = table.occupiedHumanSeatCount === table.humanSeatCount && table.botSeatCount === 0;
+    const startButton = makeButton(ready ? 'Start Kasino' : 'Venter på spillere', async () => {
+      try {
+        await request(`/api/v1/tables/${table.id}/start`, { method: 'POST' });
+        location.assign(`/kasino/?table=${encodeURIComponent(table.id)}`);
+      } catch (error) {
+        setMessage(error.message, true);
+      }
+    });
+    startButton.disabled = !ready;
+    actions.append(startButton);
+  }
+
+  if (table.gameType === 'kasino' && ['active', 'finished'].includes(table.status)) {
+    actions.append(makeButton(
+      table.status === 'finished' ? 'Se resultat' : 'Fortsæt spil',
+      () => location.assign(`/kasino/?table=${encodeURIComponent(table.id)}`),
+    ));
   }
 
   if (table.isHost && table.pendingRequestCount > 0) {

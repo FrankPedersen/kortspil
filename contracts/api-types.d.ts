@@ -893,7 +893,7 @@ export interface paths {
                                 handCount: number;
                             }[];
                             mySeat: number;
-                            hand: {
+                            hand: ({
                                 id: string;
                                 suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
                                 value: number;
@@ -904,8 +904,11 @@ export interface paths {
                                 captureAs: number[];
                                 boardAs: number[];
                                 isSweeper: boolean;
-                            }[];
-                            board: {
+                            } & {
+                                /** @enum {boolean} */
+                                isBuild?: false;
+                            })[];
+                            board: (({
                                 id: string;
                                 suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
                                 value: number;
@@ -916,9 +919,17 @@ export interface paths {
                                 captureAs: number[];
                                 boardAs: number[];
                                 isSweeper: boolean;
-                            }[];
-                            captured: {
-                                [key: string]: {
+                            } & {
+                                /** @enum {boolean} */
+                                isBuild?: false;
+                            }) | {
+                                id: string;
+                                /** @enum {boolean} */
+                                isBuild: true;
+                                groups: number;
+                                value: number;
+                                owner: number;
+                                cards: ({
                                     id: string;
                                     suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
                                     value: number;
@@ -929,7 +940,27 @@ export interface paths {
                                     captureAs: number[];
                                     boardAs: number[];
                                     isSweeper: boolean;
-                                }[];
+                                } & {
+                                    /** @enum {boolean} */
+                                    isBuild?: false;
+                                })[];
+                            })[];
+                            captured: {
+                                [key: string]: ({
+                                    id: string;
+                                    suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
+                                    value: number;
+                                    displayName: string;
+                                    symbol: string;
+                                    name: string;
+                                    buildAs: number[];
+                                    captureAs: number[];
+                                    boardAs: number[];
+                                    isSweeper: boolean;
+                                } & {
+                                    /** @enum {boolean} */
+                                    isBuild?: false;
+                                })[];
                             };
                             sweeps: {
                                 [key: string]: number;
@@ -1085,7 +1116,7 @@ export interface paths {
                                 handCount: number;
                             }[];
                             mySeat: number;
-                            hand: {
+                            hand: ({
                                 id: string;
                                 suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
                                 value: number;
@@ -1096,8 +1127,11 @@ export interface paths {
                                 captureAs: number[];
                                 boardAs: number[];
                                 isSweeper: boolean;
-                            }[];
-                            board: {
+                            } & {
+                                /** @enum {boolean} */
+                                isBuild?: false;
+                            })[];
+                            board: (({
                                 id: string;
                                 suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
                                 value: number;
@@ -1108,9 +1142,17 @@ export interface paths {
                                 captureAs: number[];
                                 boardAs: number[];
                                 isSweeper: boolean;
-                            }[];
-                            captured: {
-                                [key: string]: {
+                            } & {
+                                /** @enum {boolean} */
+                                isBuild?: false;
+                            }) | {
+                                id: string;
+                                /** @enum {boolean} */
+                                isBuild: true;
+                                groups: number;
+                                value: number;
+                                owner: number;
+                                cards: ({
                                     id: string;
                                     suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
                                     value: number;
@@ -1121,7 +1163,27 @@ export interface paths {
                                     captureAs: number[];
                                     boardAs: number[];
                                     isSweeper: boolean;
-                                }[];
+                                } & {
+                                    /** @enum {boolean} */
+                                    isBuild?: false;
+                                })[];
+                            })[];
+                            captured: {
+                                [key: string]: ({
+                                    id: string;
+                                    suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
+                                    value: number;
+                                    displayName: string;
+                                    symbol: string;
+                                    name: string;
+                                    buildAs: number[];
+                                    captureAs: number[];
+                                    boardAs: number[];
+                                    isSweeper: boolean;
+                                } & {
+                                    /** @enum {boolean} */
+                                    isBuild?: false;
+                                })[];
                             };
                             sweeps: {
                                 [key: string]: number;
@@ -1234,6 +1296,359 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tables/{tableId}/move-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview legal Kasino moves for the current player. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    tableId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        handCardId: string;
+                        targetItemIds: string[];
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            type: "SPAR_FEM" | "SMID_UD" | "STIK" | "BYG_ENKELT" | "BYG_DOBBELT";
+                            buildValue?: number;
+                            groupCount?: number;
+                        }[];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tables/{tableId}/turns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Play a server-validated Kasino turn. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    tableId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        expectedVersion: number;
+                        action: {
+                            type: "SPAR_FEM" | "SMID_UD" | "STIK" | "BYG_ENKELT" | "BYG_DOBBELT";
+                            handCardId: string;
+                            targetItemIds: string[];
+                            buildValue?: number;
+                            groupCount?: number;
+                        };
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            gameType: "kasino";
+                            version: number;
+                            /** @enum {string} */
+                            phase: "playing";
+                            roundNumber: number;
+                            turnSeat: number;
+                            players: {
+                                seatNumber: number;
+                                kind: "human" | "bot";
+                                handCount: number;
+                            }[];
+                            mySeat: number;
+                            hand: ({
+                                id: string;
+                                suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
+                                value: number;
+                                displayName: string;
+                                symbol: string;
+                                name: string;
+                                buildAs: number[];
+                                captureAs: number[];
+                                boardAs: number[];
+                                isSweeper: boolean;
+                            } & {
+                                /** @enum {boolean} */
+                                isBuild?: false;
+                            })[];
+                            board: (({
+                                id: string;
+                                suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
+                                value: number;
+                                displayName: string;
+                                symbol: string;
+                                name: string;
+                                buildAs: number[];
+                                captureAs: number[];
+                                boardAs: number[];
+                                isSweeper: boolean;
+                            } & {
+                                /** @enum {boolean} */
+                                isBuild?: false;
+                            }) | {
+                                id: string;
+                                /** @enum {boolean} */
+                                isBuild: true;
+                                groups: number;
+                                value: number;
+                                owner: number;
+                                cards: ({
+                                    id: string;
+                                    suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
+                                    value: number;
+                                    displayName: string;
+                                    symbol: string;
+                                    name: string;
+                                    buildAs: number[];
+                                    captureAs: number[];
+                                    boardAs: number[];
+                                    isSweeper: boolean;
+                                } & {
+                                    /** @enum {boolean} */
+                                    isBuild?: false;
+                                })[];
+                            })[];
+                            captured: {
+                                [key: string]: ({
+                                    id: string;
+                                    suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
+                                    value: number;
+                                    displayName: string;
+                                    symbol: string;
+                                    name: string;
+                                    buildAs: number[];
+                                    captureAs: number[];
+                                    boardAs: number[];
+                                    isSweeper: boolean;
+                                } & {
+                                    /** @enum {boolean} */
+                                    isBuild?: false;
+                                })[];
+                            };
+                            sweeps: {
+                                [key: string]: number;
+                            };
+                            scores: {
+                                [key: string]: number;
+                            };
+                            lastTaker: number | null;
+                            winner: number | null;
+                        } | {
+                            /** @enum {string} */
+                            gameType: "es-makker";
+                            version: number;
+                            /** @enum {string} */
+                            phase: "bidding";
+                            roundNumber: number;
+                            dealerSeat: number;
+                            currentBidderSeat: number;
+                            players: {
+                                seatNumber: number;
+                                kind: "human" | "bot";
+                                handCount: number;
+                            }[];
+                            mySeat: number;
+                            hand: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            }[];
+                            handCounts: {
+                                [key: string]: number;
+                            };
+                            kittyCount: number;
+                            bids: {
+                                seatNumber: number;
+                                kind: "pass" | "bid";
+                            }[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;

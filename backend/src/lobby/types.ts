@@ -1,4 +1,5 @@
 import type { GameSnapshot } from '../game/state.js';
+import type { KasinoMoveOption, KasinoTurnAction } from '../game/kasino-engine.js';
 
 export type GameType = 'es-makker' | 'kasino';
 export type TableVisibility = 'open' | 'private';
@@ -71,6 +72,18 @@ export interface LobbyRepository {
   ): Promise<void>;
   startGame(tableId: string, ownerSubject: string): Promise<GameSnapshot>;
   getGameSnapshot(tableId: string, userSubject: string): Promise<GameSnapshot>;
+  getKasinoMoveOptions(
+    tableId: string,
+    userSubject: string,
+    handCardId: string,
+    targetItemIds: string[],
+  ): Promise<KasinoMoveOption[]>;
+  playKasinoTurn(
+    tableId: string,
+    userSubject: string,
+    expectedVersion: number,
+    action: KasinoTurnAction,
+  ): Promise<GameSnapshot>;
 }
 
 export class LobbyError extends Error {

@@ -53,6 +53,6 @@ Pages via [workflowet](.github/workflows/pages.yml).
 
 TypeScript/Node API, SQL-migreringer og OpenAPI-kontrakter ligger i
 `backend/` og `contracts/`. Se [backendens README](backend/README.md) for lokal
-opstart. Den beskyttede online-lobby kan oprette borde og håndtere
-pladsanmodninger. Selve spilrunderne er endnu ikke koblet til lobbyen.
+opstart. Kasino kan spilles online fra den beskyttede lobby med 2-4 mennesker;
+Es Makker online er endnu ikke tilsluttet.
 Azure-ressourcer oprettes ikke af lokal udvikling eller GitHub Pages.
