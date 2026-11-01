@@ -66,6 +66,33 @@ h1 {
   gap: 22px;
 }
 
+.online-lobby {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+  padding: clamp(22px, 4vw, 32px);
+  border: 1px solid rgb(215 228 183 / 32%);
+  border-radius: 18px;
+  background: linear-gradient(110deg, rgb(215 228 183 / 12%), rgb(255 255 255 / 3%));
+}
+
+.online-lobby .eyebrow {
+  margin-bottom: 8px;
+}
+
+.online-lobby h2 {
+  margin-bottom: 8px;
+  font-size: clamp(1.35rem, 3vw, 1.8rem);
+}
+
+.online-lobby p:last-child {
+  margin-bottom: 0;
+  color: #c4d0c3;
+  line-height: 1.5;
+}
+
 .game-card {
   display: flex;
   min-height: 340px;
@@ -157,6 +184,13 @@ footer {
   .games {
     grid-template-columns: 1fr;
     gap: 15px;
+  }
+
+  .online-lobby {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 15px;
   }
 
   .game-card {

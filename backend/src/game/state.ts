@@ -1,0 +1,369 @@
+import { randomInt } from 'node:crypto';
+import { Type, type Static } from '@sinclair/typebox';
+import { Value } from '@sinclair/typebox/value';
+import { LobbyError, type GameType } from '../lobby/types.js';
+
+const PublicPlayerSchema = Type.Object({
+  seatNumber: Type.Integer({ minimum: 0, maximum: 3 }),
+  kind: Type.Union([Type.Literal('human'), Type.Literal('bot')]),
+  handCount: Type.Integer({ minimum: 0 }),
+});
+
+const StoredPlayerSchema = Type.Object({
+  seatNumber: Type.Integer({ minimum: 0, maximum: 3 }),
+  kind: Type.Union([Type.Literal('human'), Type.Literal('bot')]),
+  userSubject: Type.Union([Type.String(), Type.Null()]),
+  handCount: Type.Integer({ minimum: 0 }),
+});
+
+const CasinoCardSchema = Type.Object({
+  id: Type.String(),
+  suit: Type.Union([
+    Type.Literal('SPADES'),
+    Type.Literal('HEARTS'),
+    Type.Literal('DIAMONDS'),
+    Type.Literal('CLUBS'),
+  ]),
+  value: Type.Integer({ minimum: 1, maximum: 13 }),
+  displayName: Type.String(),
+  symbol: Type.String(),
+  name: Type.String(),
+  buildAs: Type.Array(Type.Integer()),
+  captureAs: Type.Array(Type.Integer()),
+  boardAs: Type.Array(Type.Integer()),
+  isSweeper: Type.Boolean(),
+});
+
+const EsMakkerCardSchema = Type.Object({
+  id: Type.String(),
+  suit: Type.Union([
+    Type.Literal('clubs'),
+    Type.Literal('diamonds'),
+    Type.Literal('hearts'),
+    Type.Literal('spades'),
+    Type.Null(),
+  ]),
+  rank: Type.Union([Type.String(), Type.Null()]),
+  jokerNo: Type.Integer({ minimum: -1, maximum: 2 }),
+  isJoker: Type.Boolean(),
+});
+
+const KasinoStoredStateSchema = Type.Object({
+  gameType: Type.Literal('kasino'),
+  version: Type.Integer({ minimum: 1 }),
+  phase: Type.Literal('playing'),
+  roundNumber: Type.Integer({ minimum: 1 }),
+  turnSeat: Type.Integer({ minimum: 0, maximum: 3 }),
+  players: Type.Array(StoredPlayerSchema, { minItems: 2, maxItems: 4 }),
+  deck: Type.Array(CasinoCardSchema),
+  hands: Type.Record(Type.String(), Type.Array(CasinoCardSchema)),
+  board: Type.Array(CasinoCardSchema),
+  lastTaker: Type.Union([Type.Integer({ minimum: 0, maximum: 3 }), Type.Null()]),
+  captured: Type.Record(Type.String(), Type.Array(CasinoCardSchema)),
+  sweeps: Type.Record(Type.String(), Type.Integer({ minimum: 0 })),
+  scores: Type.Record(Type.String(), Type.Integer({ minimum: 0 })),
+  winner: Type.Union([Type.Integer({ minimum: 0, maximum: 3 }), Type.Null()]),
+});
+
+const EsMakkerStoredStateSchema = Type.Object({
+  gameType: Type.Literal('es-makker'),
+  version: Type.Integer({ minimum: 1 }),
+  phase: Type.Literal('bidding'),
+  roundNumber: Type.Integer({ minimum: 1 }),
+  dealerSeat: Type.Integer({ minimum: 0, maximum: 3 }),
+  currentBidderSeat: Type.Integer({ minimum: 0, maximum: 3 }),
+  players: Type.Array(StoredPlayerSchema, { minItems: 4, maxItems: 4 }),
+  hands: Type.Record(Type.String(), Type.Array(EsMakkerCardSchema)),
+  kitty: Type.Array(EsMakkerCardSchema, { minItems: 3, maxItems: 3 }),
+  bids: Type.Array(Type.Object({
+    seatNumber: Type.Integer({ minimum: 0, maximum: 3 }),
+    kind: Type.Union([Type.Literal('pass'), Type.Literal('bid')]),
+  })),
+});
+
+export const MultiplayerGameStateSchema = Type.Union([
+  KasinoStoredStateSchema,
+  EsMakkerStoredStateSchema,
+]);
+
+export type MultiplayerGameState = Static<typeof MultiplayerGameStateSchema>;
+
+const KasinoSnapshotSchema = Type.Object({
+  gameType: Type.Literal('kasino'),
+  version: Type.Integer({ minimum: 1 }),
+  phase: Type.Literal('playing'),
+  roundNumber: Type.Integer({ minimum: 1 }),
+  turnSeat: Type.Integer({ minimum: 0, maximum: 3 }),
+  players: Type.Array(PublicPlayerSchema, { minItems: 2, maxItems: 4 }),
+  mySeat: Type.Integer({ minimum: 0, maximum: 3 }),
+  hand: Type.Array(CasinoCardSchema),
+  board: Type.Array(CasinoCardSchema),
+  captured: Type.Record(Type.String(), Type.Array(CasinoCardSchema)),
+  sweeps: Type.Record(Type.String(), Type.Integer({ minimum: 0 })),
+  scores: Type.Record(Type.String(), Type.Integer({ minimum: 0 })),
+  lastTaker: Type.Union([Type.Integer({ minimum: 0, maximum: 3 }), Type.Null()]),
+  winner: Type.Union([Type.Integer({ minimum: 0, maximum: 3 }), Type.Null()]),
+});
+
+const EsMakkerSnapshotSchema = Type.Object({
+  gameType: Type.Literal('es-makker'),
+  version: Type.Integer({ minimum: 1 }),
+  phase: Type.Literal('bidding'),
+  roundNumber: Type.Integer({ minimum: 1 }),
+  dealerSeat: Type.Integer({ minimum: 0, maximum: 3 }),
+  currentBidderSeat: Type.Integer({ minimum: 0, maximum: 3 }),
+  players: Type.Array(PublicPlayerSchema, { minItems: 4, maxItems: 4 }),
+  mySeat: Type.Integer({ minimum: 0, maximum: 3 }),
+  hand: Type.Array(EsMakkerCardSchema, { minItems: 13, maxItems: 13 }),
+  handCounts: Type.Record(Type.String(), Type.Integer({ minimum: 0 })),
+  kittyCount: Type.Integer({ minimum: 0, maximum: 3 }),
+  bids: Type.Array(Type.Object({
+    seatNumber: Type.Integer({ minimum: 0, maximum: 3 }),
+    kind: Type.Union([Type.Literal('pass'), Type.Literal('bid')]),
+  })),
+});
+
+export const GameSnapshotSchema = Type.Union([
+  KasinoSnapshotSchema,
+  EsMakkerSnapshotSchema,
+]);
+
+export type GameSnapshot = Static<typeof GameSnapshotSchema>;
+
+export interface GameSeat {
+  seatNumber: number;
+  kind: 'human' | 'bot';
+  userSubject: string | null;
+}
+
+export function createInitialGameState(
+  gameType: GameType,
+  seats: GameSeat[],
+  hostSubject: string,
+): MultiplayerGameState {
+  validateSeats(gameType, seats, hostSubject);
+  if (gameType === 'kasino') return createKasinoState(seats);
+  return createEsMakkerState(seats, hostSubject);
+}
+
+export function parseGameState(value: string, expectedGameType: GameType): MultiplayerGameState {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(value);
+  } catch {
+    throw new Error('Stored multiplayer game state is not valid JSON.');
+  }
+  if (!Value.Check(MultiplayerGameStateSchema, parsed) || parsed.gameType !== expectedGameType) {
+    throw new Error('Stored multiplayer game state does not match its schema.');
+  }
+  return parsed;
+}
+
+export function createGameSnapshot(
+  state: MultiplayerGameState,
+  userSubject: string,
+): GameSnapshot {
+  return projectSnapshot(state, userSubject);
+}
+
+function projectSnapshot(state: MultiplayerGameState, userSubject: string): GameSnapshot {
+  const player = state.players.find(candidate => candidate.userSubject === userSubject);
+  if (!player) throw new LobbyError(403, 'You do not occupy a seat at this table.');
+
+  const players = state.players.map(({ seatNumber, kind, handCount }) => ({
+    seatNumber,
+    kind,
+    handCount,
+  }));
+  if (state.gameType === 'kasino') {
+    return {
+      gameType: state.gameType,
+      version: state.version,
+      phase: state.phase,
+      roundNumber: state.roundNumber,
+      turnSeat: state.turnSeat,
+      players,
+      mySeat: player.seatNumber,
+      hand: state.hands[String(player.seatNumber)] ?? [],
+      board: state.board,
+      captured: state.captured,
+      sweeps: state.sweeps,
+      scores: state.scores,
+      lastTaker: state.lastTaker,
+      winner: state.winner,
+    };
+  }
+
+  return {
+    gameType: state.gameType,
+    version: state.version,
+    phase: state.phase,
+    roundNumber: state.roundNumber,
+    dealerSeat: state.dealerSeat,
+    currentBidderSeat: state.currentBidderSeat,
+    players,
+    mySeat: player.seatNumber,
+    hand: state.hands[String(player.seatNumber)] ?? [],
+    handCounts: Object.fromEntries(state.players.map(item => [
+      String(item.seatNumber),
+      state.hands[String(item.seatNumber)]?.length ?? 0,
+    ])),
+    kittyCount: state.kitty.length,
+    bids: state.bids,
+  };
+}
+
+function createKasinoState(seats: GameSeat[]): MultiplayerGameState {
+  const deck = shuffle(kasinoDeck());
+  const hands: Record<string, KasinoCard[]> = {};
+  const players = seats.map(seat => ({
+    seatNumber: seat.seatNumber,
+    kind: seat.kind,
+    userSubject: seat.userSubject,
+    handCount: 4,
+  }));
+  for (const seat of seats) hands[String(seat.seatNumber)] = deck.splice(0, 4);
+  const board = deck.splice(0, 4);
+  const captured = Object.fromEntries(seats.map(seat => [String(seat.seatNumber), []]));
+  const sweeps = Object.fromEntries(seats.map(seat => [String(seat.seatNumber), 0]));
+  const scores = Object.fromEntries(seats.map(seat => [String(seat.seatNumber), 0]));
+  return {
+    gameType: 'kasino',
+    version: 1,
+    phase: 'playing',
+    roundNumber: 1,
+    turnSeat: seats[0]?.seatNumber ?? 0,
+    players,
+    deck,
+    hands,
+    board,
+    lastTaker: null,
+    captured,
+    sweeps,
+    scores,
+    winner: null,
+  };
+}
+
+function createEsMakkerState(seats: GameSeat[], hostSubject: string): MultiplayerGameState {
+  const orderedSeats = [...seats].sort((left, right) => left.seatNumber - right.seatNumber);
+  const hostSeat = orderedSeats.find(seat => seat.userSubject === hostSubject)?.seatNumber;
+  if (hostSeat === undefined) throw new LobbyError(409, 'The host must occupy a seat to start the game.');
+  const dealerSeat = (hostSeat + 1) % 4;
+  const activeSeats = Array.from({ length: 4 }, (_, index) => (dealerSeat + index + 1) % 4);
+  const deck = shuffle(esMakkerDeck());
+  const hands: Record<string, EsMakkerCard[]> = Object.fromEntries(activeSeats.map(seat => [String(seat), []]));
+  for (const packet of [3, 3, 3, 4]) {
+    for (const seatNumber of activeSeats) {
+      hands[String(seatNumber)]?.push(...deck.splice(0, packet));
+    }
+  }
+  const kitty = deck.splice(0, 3);
+  const players = orderedSeats.map(seat => ({
+    seatNumber: seat.seatNumber,
+    kind: seat.kind,
+    userSubject: seat.userSubject,
+    handCount: 13,
+  }));
+  return {
+    gameType: 'es-makker',
+    version: 1,
+    phase: 'bidding',
+    roundNumber: 1,
+    dealerSeat,
+    currentBidderSeat: activeSeats[0] ?? 0,
+    players,
+    hands,
+    kitty,
+    bids: [],
+  };
+}
+
+function validateSeats(gameType: GameType, seats: GameSeat[], hostSubject: string): void {
+  if (seats.some((seat, index) => seat.seatNumber !== index)) {
+    throw new LobbyError(409, 'The table seat arrangement is invalid.');
+  }
+  if (seats.some(seat => seat.kind === 'human' && seat.userSubject === null)) {
+    throw new LobbyError(409, 'All human seats must be occupied before the game starts.');
+  }
+  if (!seats.some(seat => seat.userSubject === hostSubject)) {
+    throw new LobbyError(403, 'Only the table host can start the game.');
+  }
+  const humans = seats.filter(seat => seat.kind === 'human').length;
+  const bots = seats.filter(seat => seat.kind === 'bot').length;
+  if (
+    (gameType === 'es-makker' && seats.length !== 4) ||
+    (gameType === 'kasino' && (seats.length < 2 || seats.length > 4)) ||
+    humans < 1 ||
+    humans + bots !== seats.length
+  ) {
+    throw new LobbyError(409, 'The table composition is invalid for this game.');
+  }
+}
+
+function kasinoDeck(): KasinoCard[] {
+  const suits = [
+    { key: 'SPADES', name: 'Spar', symbol: '♠' },
+    { key: 'HEARTS', name: 'Hjerter', symbol: '♥' },
+    { key: 'DIAMONDS', name: 'Ruder', symbol: '♦' },
+    { key: 'CLUBS', name: 'Klør', symbol: '♣' },
+  ] as const;
+  return suits.flatMap(suit => Array.from({ length: 13 }, (_, index) => {
+    const value = index + 1;
+    const displayName = value === 1 ? 'A'
+      : value === 11 ? 'J'
+        : value === 12 ? 'Q'
+          : value === 13 ? 'K'
+            : String(value);
+    const isAce = value === 1;
+    const isSulan = suit.key === 'DIAMONDS' && value === 10;
+    const isKrabben = suit.key === 'SPADES' && value === 2;
+    const values = isAce ? [1] : isSulan ? [10, 16] : isKrabben ? [2, 15] : [value];
+    return {
+      id: `${suit.key}_${value}`,
+      suit: suit.key,
+      value,
+      displayName,
+      symbol: suit.symbol,
+      name: `${suit.name} ${displayName}`,
+      buildAs: values,
+      captureAs: isAce ? [1, 14] : values,
+      boardAs: isAce ? [1, 14] : values,
+      isSweeper: suit.key === 'SPADES' && value === 5,
+    };
+  }));
+}
+
+function esMakkerDeck(): EsMakkerCard[] {
+  const suits = ['clubs', 'diamonds', 'hearts', 'spades'] as const;
+  const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'] as const;
+  const cards: EsMakkerCard[] = suits.flatMap(suit => ranks.map(rank => ({
+    id: `${rank}-${suit}`,
+    suit,
+    rank,
+    jokerNo: -1,
+    isJoker: false,
+  })));
+  for (let jokerNo = 0; jokerNo < 3; jokerNo += 1) {
+    cards.push({
+      id: `JK${jokerNo}`,
+      suit: null,
+      rank: null,
+      jokerNo,
+      isJoker: true,
+    });
+  }
+  return cards;
+}
+
+function shuffle<T>(cards: T[]): T[] {
+  const shuffled = [...cards];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = randomInt(index + 1);
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex]!, shuffled[index]!];
+  }
+  return shuffled;
+}
+
+type KasinoCard = Static<typeof CasinoCardSchema>;
+type EsMakkerCard = Static<typeof EsMakkerCardSchema>;

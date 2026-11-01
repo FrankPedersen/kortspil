@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="da">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#123c30" />
+    <meta
+      name="description"
+      content="Find et bord eller opret en multiplayer-lobby til Es Makker og Kasino."
+    />
+    <link rel="stylesheet" href="./lobby.css" />
+    <title>Online lobby – Kortspil</title>
+  </head>
+  <body>
+    <main class="lobby">
+      <header class="topbar">
+        <a class="brand" href="https://www.kontraktbridge.dk/kortspil/">Kortspil</a>
+        <div class="account">
+          <span id="session-status" role="status">Indlæser din konto …</span>
+          <a id="login-link" class="button button--secondary" href="/.auth/login/aad?post_login_redirect_uri=%2Flobby%2F" hidden>
+            Log ind
+          </a>
+          <a
+            id="logout-link"
+            class="button button--secondary"
+            href="https://kortspil-api-20261101-v2.azurewebsites.net/.auth/logout?post_logout_redirect_uri=https%3A%2F%2Fwww.kontraktbridge.dk%2Fkortspil%2F"
+            hidden
+          >
+            Log ud
+          </a>
+        </div>
+      </header>
+
+      <section class="intro">
+        <p class="eyebrow">Es Makker · Kasino</p>
+        <h1>Online lobby</h1>
+        <p>
+          Opret et bord, eller anmod om en plads ved et åbent bord. Du skal være
+          logget ind med din Microsoft-konto.
+        </p>
+      </section>
+
+      <section class="panel" aria-labelledby="create-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Kom i gang</p>
+            <h2 id="create-heading">Opret et bord</h2>
+          </div>
+        </div>
+        <form id="create-table-form" class="create-form">
+          <label>
+            <span>Spil</span>
+            <select id="game-type" name="gameType">
+              <option value="kasino">Kasino</option>
+              <option value="es-makker">Es Makker</option>
+            </select>
+          </label>
+          <label>
+            <span>Menneskelige pladser, inkl. dig</span>
+            <select id="human-seats" name="humanSeatCount"></select>
+          </label>
+          <label>
+            <span>Robotter</span>
+            <select id="bot-seats" name="botSeatCount"></select>
+          </label>
+          <p id="seat-help" class="form-help"></p>
+          <button class="button" type="submit">Opret åbent bord</button>
+        </form>
+      </section>
+
+      <section class="panel tables-panel" aria-labelledby="tables-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Find spillere</p>
+            <h2 id="tables-heading">Åbne borde</h2>
+          </div>
+          <button id="refresh-tables" class="button button--secondary" type="button">
+            Opdater
+          </button>
+        </div>
+        <p id="lobby-message" class="message" role="status" aria-live="polite"></p>
+        <ul id="table-list" class="table-list"></ul>
+        <p id="empty-tables" class="empty-state" hidden>
+          Der er ingen åbne borde lige nu. Opret et bord, så kan andre anmode
+          om en plads.
+        </p>
+      </section>
+
+      <p class="notice">
+        Borde og pladsanmodninger virker online. Selve spilrunderne er endnu
+        ikke koblet til lobbyen; du kan fortsat spille solo fra
+        <a href="https://www.kontraktbridge.dk/kortspil/">forsiden</a>.
+      </p>
+    </main>
+    <script type="module" src="./lobby.js"></script>
+  </body>
+</html>
