@@ -347,6 +347,45 @@ test('mutations reject missing authentication and cross-origin requests', async 
   assert.equal(crossOrigin.statusCode, 403);
 });
 
+test('mutations accept the API same-origin when the public website URL is different', async () => {
+  const app = await createApp({
+    appServiceAuthEnabled: true,
+    lobbyRepository: new MemoryLobbyRepository(),
+    publicAppUrl: 'https://www.kontraktbridge.dk/kortspil',
+  });
+  const sameOrigin = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tables',
+    headers: {
+      ...authHeaders('host'),
+      host: 'localhost:3000',
+    },
+    payload: {
+      gameType: 'kasino',
+      visibility: 'open',
+      humanSeatCount: 2,
+      botSeatCount: 0,
+    },
+  });
+  assert.equal(sameOrigin.statusCode, 201);
+
+  const attacker = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tables',
+    headers: {
+      ...authHeaders('attacker'),
+      origin: 'https://attacker.example',
+    },
+    payload: {
+      gameType: 'kasino',
+      visibility: 'open',
+      humanSeatCount: 2,
+      botSeatCount: 0,
+    },
+  });
+  assert.equal(attacker.statusCode, 403);
+});
+
 test('Kasino starts on the server and reconnect returns only each seated player’s hand', async () => {
   const app = await createApp({
     appServiceAuthEnabled: true,

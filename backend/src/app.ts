@@ -108,7 +108,21 @@ export async function buildApp(options: AppOptions = {}): Promise<FastifyInstanc
       return reply.code(403).send({ message: 'A same-origin request is required.' });
     }
 
-    if (origin !== parsedPublicAppUrl.origin) {
+    let requestOrigin: string | null = null;
+    const forwardedProtocol = request.headers['x-forwarded-proto'];
+    const protocol = typeof forwardedProtocol === 'string'
+      ? forwardedProtocol.split(',')[0]?.trim()
+      : request.protocol;
+    const host = request.headers.host;
+    if (protocol && host) {
+      try {
+        requestOrigin = new URL(`${protocol}://${host}`).origin;
+      } catch {
+        requestOrigin = null;
+      }
+    }
+
+    if (origin !== parsedPublicAppUrl.origin && origin !== requestOrigin) {
       return reply.code(403).send({ message: 'Cross-origin requests are not allowed.' });
     }
   });
