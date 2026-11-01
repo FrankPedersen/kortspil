@@ -81,6 +81,54 @@ test('session endpoint resolves an Azure AD identity and configured VIP administ
   });
 });
 
+test('session endpoint resolves the documented App Service claims principal', async () => {
+  const subject = 'entra-object-id-123';
+  const app = await createApp({
+    appServiceAuthEnabled: true,
+    vipAdminUserIds: new Set([subject]),
+  });
+  const principal = Buffer.from(JSON.stringify({
+    auth_typ: 'aad',
+    claims: [
+      { typ: 'http://schemas.microsoft.com/identity/claims/objectidentifier', val: subject },
+      { typ: 'name', val: 'Frank' },
+    ],
+    name_typ: 'name',
+    role_typ: 'role',
+  })).toString('base64');
+  const response = await app.inject({
+    method: 'GET',
+    url: '/api/v1/session',
+    headers: { 'x-ms-client-principal': principal },
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.deepEqual(response.json(), {
+    identity: {
+      subject,
+      displayName: 'Frank',
+      provider: 'aad',
+      vipAdministrator: true,
+    },
+  });
+});
+
+test('session endpoint rejects an App Service claims principal without a stable subject', async () => {
+  const app = await createApp({ appServiceAuthEnabled: true });
+  const principal = Buffer.from(JSON.stringify({
+    auth_typ: 'aad',
+    claims: [{ typ: 'name', val: 'Frank' }],
+    name_typ: 'name',
+  })).toString('base64');
+  const response = await app.inject({
+    method: 'GET',
+    url: '/api/v1/session',
+    headers: { 'x-ms-client-principal': principal },
+  });
+
+  assert.equal(response.statusCode, 401);
+});
+
 test('session endpoint rejects a malformed trusted principal header', async () => {
   const app = await createApp({ appServiceAuthEnabled: true });
   const response = await app.inject({
