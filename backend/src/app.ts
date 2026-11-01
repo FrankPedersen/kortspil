@@ -100,6 +100,19 @@ export async function buildApp(options: AppOptions = {}): Promise<FastifyInstanc
       decorateReply: false,
     });
   }
+  const esMakkerAssets = resolve(process.cwd(), 'public', 'es-makker');
+  if (process.env.NODE_ENV === 'production' && !existsSync(esMakkerAssets)) {
+    throw new Error('The Es Makker client must be copied into backend/public/es-makker before production startup.');
+  }
+  if (existsSync(esMakkerAssets)) {
+    await app.register(fastifyStatic, {
+      root: esMakkerAssets,
+      prefix: '/es-makker/',
+      index: ['index.html'],
+      cacheControl: false,
+      decorateReply: false,
+    });
+  }
 
   app.addHook('onRequest', async (request, reply) => {
     if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) return;

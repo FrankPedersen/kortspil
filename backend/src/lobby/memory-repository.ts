@@ -10,6 +10,7 @@ import {
   getKasinoMoveOptions,
   type KasinoTurnAction,
 } from '../game/kasino-engine.js';
+import { applyEsMakkerAction, type EsMakkerAction } from '../game/es-makker-engine.js';
 import {
   LobbyError,
   type CreateTableInput,
@@ -304,6 +305,22 @@ export class MemoryLobbyRepository implements LobbyRepository {
     return createGameSnapshot(table.gameState, userSubject);
   }
 
+  async playEsMakkerAction(
+    tableId: string,
+    userSubject: string,
+    expectedVersion: number,
+    action: EsMakkerAction,
+  ) {
+    const table = this.getActiveTable(tableId, userSubject);
+    if (!table.gameState || table.gameState.gameType !== 'es-makker') {
+      throw new LobbyError(409, 'This table is not an Es Makker game.');
+    }
+    const seatNumber = table.seats.indexOf(userSubject);
+    table.gameState = applyEsMakkerAction(table.gameState, seatNumber, expectedVersion, action);
+    if (table.gameState.phase === 'finished') table.status = 'finished';
+    return createGameSnapshot(table.gameState, userSubject);
+  }
+
   private hasValidInvitation(tableId: string, tokenHash?: Buffer): boolean {
     if (!tokenHash) return false;
     const invitation = this.invitations.get(tokenHash.toString('hex'));
@@ -355,7 +372,8 @@ function validateComposition(input: CreateTableInput): void {
     !Number.isInteger(input.botSeatCount) ||
     input.humanSeatCount < 1 ||
     input.botSeatCount < 0 ||
-    (input.gameType === 'es-makker' && input.humanSeatCount + input.botSeatCount !== 4) ||
+    (input.gameType === 'es-makker' &&
+      (input.humanSeatCount !== 4 || input.botSeatCount !== 0)) ||
     (input.gameType === 'kasino' &&
       (input.humanSeatCount + input.botSeatCount < 2 || input.humanSeatCount + input.botSeatCount > 4))
   ) {

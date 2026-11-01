@@ -30,8 +30,9 @@ npm run contracts:generate
 
 The lobby API includes table creation/listing, seat requests and host decisions,
 private invitations (hashed tokens, revocation, and fragment-based links), and
-VIP requests/administration. Mutations require the configured same-origin
-`PUBLIC_APP_URL`, App Service Authentication, and a valid AAD principal.
+VIP requests/administration. Mutations require App Service Authentication, a
+valid AAD principal, and a request origin matching either `PUBLIC_APP_URL` or
+the API's own origin.
 `VIP_ADMIN_USER_IDS` is a comma-separated list of trusted App Service subject
 IDs; it is not populated from client claims.
 
@@ -39,15 +40,20 @@ Kasino can be played online at `/kasino/?table={tableId}`. The host starts a
 full table from `/lobby/`; players receive only their own hands, and legal
 Kasino actions are checked and persisted by the API. Turns use state versions
 to reject stale submissions. Online Kasino currently requires 2-4 human
-players; bots are not supported. Es Makker can be listed in the lobby, but its
-online game flow is not connected yet.
+players; bots are not supported.
+
+Es Makker can be played online at `/es-makker/?table={tableId}`. It requires
+four human players. The API validates the full bidding, trump, partner-card,
+exchange, and trick-playing flow, and returns private, versioned snapshots.
+Bots are not supported online.
 
 To build the Kasino client for the API's same-origin route, run
 `npm run build` in `Kasino/`. The Vite build copies its `/kasino/` assets into
 `backend/public/kasino/`; include that directory when deploying the backend.
-Production startup fails if these assets are missing. The standard GitHub
-Pages build overrides the base path and does not copy Pages assets into the
-API directory.
+`npm run build` in `backend/` copies the Es Makker client into
+`backend/public/es-makker/`. Include both directories when deploying the
+backend. Production startup fails if either client is missing. The standard
+GitHub Pages build continues to publish the solo game separately.
 
 Local development uses an in-memory repository and is not durable. Production
 always uses Azure SQL and fails startup if SQL configuration is missing; there
@@ -60,10 +66,9 @@ to multiple instances.
 
 The protected browser lobby is served from `/lobby/` on the API's own origin.
 This keeps App Service Authentication cookies same-origin and avoids weakening
-authentication for browser preflight requests. The lobby can create public
-tables with at least one human seat available for another player, request
-seats, and approve requests; the standalone game clients do not yet consume
-multiplayer snapshots.
+authentication for browser preflight requests. The lobby can create tables,
+request seats, and approve requests. Seated players can start or resume their
+Kasino and Es Makker games from the same origin.
 
 Set `APPLICATIONINSIGHTS_CONNECTION_STRING` to enable Azure Monitor OpenTelemetry.
 Production startup fails if the connection string is missing. Local runs can

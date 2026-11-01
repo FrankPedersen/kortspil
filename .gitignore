@@ -3,4 +3,5 @@ Kasino/dist/
 node_modules/
 dist/
 backend/public/kasino/
+backend/public/es-makker/
 .DS_Store

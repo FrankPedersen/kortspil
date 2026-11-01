@@ -1,5 +1,6 @@
 import type { GameSnapshot } from '../game/state.js';
 import type { KasinoMoveOption, KasinoTurnAction } from '../game/kasino-engine.js';
+import type { EsMakkerAction } from '../game/es-makker-engine.js';
 
 export type GameType = 'es-makker' | 'kasino';
 export type TableVisibility = 'open' | 'private';
@@ -83,6 +84,12 @@ export interface LobbyRepository {
     userSubject: string,
     expectedVersion: number,
     action: KasinoTurnAction,
+  ): Promise<GameSnapshot>;
+  playEsMakkerAction(
+    tableId: string,
+    userSubject: string,
+    expectedVersion: number,
+    action: EsMakkerAction,
   ): Promise<GameSnapshot>;
 }
 

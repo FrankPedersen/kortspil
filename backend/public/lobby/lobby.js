@@ -59,23 +59,15 @@ function addOptions(select, values, selected) {
 function updateSeatOptions() {
   const game = gameType.value;
   const humanValue = Number(humanSeats.value) || (game === 'es-makker' ? 4 : 2);
-  const botValue = Number(botSeats.value) || 0;
-  const maxPlayers = game === 'es-makker' ? 4 : 4;
-  const humanOptions = Array.from({ length: 3 }, (_, index) => index + 2);
-  addOptions(humanSeats, humanOptions, Math.min(humanValue, maxPlayers));
-
-  const minTotal = game === 'es-makker' ? 4 : 2;
-  const minBots = game === 'es-makker' ? Math.max(0, minTotal - Number(humanSeats.value)) : 0;
-  const maxBots = game === 'kasino' ? 0 : maxPlayers - Number(humanSeats.value);
-  const botOptions = Array.from({ length: maxBots - minBots + 1 }, (_, index) => minBots + index);
-  const selectedBots = Math.min(Math.max(botValue, minBots), maxBots);
-  addOptions(botSeats, botOptions, selectedBots);
-  botSeats.disabled = game === 'kasino';
+  const humanOptions = game === 'es-makker' ? [4] : [2, 3, 4];
+  addOptions(humanSeats, humanOptions, game === 'es-makker' ? 4 : Math.min(humanValue, 4));
+  addOptions(botSeats, [0], 0);
+  botSeats.disabled = true;
 
   if (game === 'es-makker') {
-    seatHelp.textContent = 'Es Makker har altid fire pladser i alt. Ledige menneskepladser kan andre anmode om.';
+    seatHelp.textContent = 'Es Makker kræver fire menneskelige spillere. Robotter er endnu ikke understøttet online.';
   } else {
-    seatHelp.textContent = 'Online Kasino har 2-4 menneskelige spillere. Robotter er endnu ikke understøttet.';
+    seatHelp.textContent = 'Online Kasino har 2-4 menneskelige spillere. Robotter er endnu ikke understøttet online.';
   }
 }
 
@@ -170,12 +162,13 @@ function renderTable(table) {
     }));
   }
 
-  if (table.isHost && table.status === 'waiting' && table.gameType === 'kasino') {
+  if (table.isHost && table.status === 'waiting') {
     const ready = table.occupiedHumanSeatCount === table.humanSeatCount && table.botSeatCount === 0;
-    const startButton = makeButton(ready ? 'Start Kasino' : 'Venter på spillere', async () => {
+    const startButton = makeButton(ready ? `Start ${gameNames[table.gameType]}` : 'Venter på spillere', async () => {
       try {
         await request(`/api/v1/tables/${table.id}/start`, { method: 'POST' });
-        location.assign(`/kasino/?table=${encodeURIComponent(table.id)}`);
+        const path = table.gameType === 'kasino' ? '/kasino/' : '/es-makker/';
+        location.assign(`${path}?table=${encodeURIComponent(table.id)}`);
       } catch (error) {
         setMessage(error.message, true);
       }
@@ -184,10 +177,13 @@ function renderTable(table) {
     actions.append(startButton);
   }
 
-  if (table.gameType === 'kasino' && ['active', 'finished'].includes(table.status)) {
+  if (['active', 'finished'].includes(table.status)) {
     actions.append(makeButton(
       table.status === 'finished' ? 'Se resultat' : 'Fortsæt spil',
-      () => location.assign(`/kasino/?table=${encodeURIComponent(table.id)}`),
+      () => {
+        const path = table.gameType === 'kasino' ? '/kasino/' : '/es-makker/';
+        location.assign(`${path}?table=${encodeURIComponent(table.id)}`);
+      },
     ));
   }
 

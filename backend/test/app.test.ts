@@ -27,12 +27,18 @@ test('lobby page and assets are served by the API', async () => {
   const app = await createApp();
   const page = await app.inject({ method: 'GET', url: '/lobby/' });
   const script = await app.inject({ method: 'GET', url: '/lobby/lobby.js' });
+  const esMakkerPage = await app.inject({ method: 'GET', url: '/es-makker/' });
+  const esMakkerScript = await app.inject({ method: 'GET', url: '/es-makker/js/multiplayer.js' });
 
   assert.equal(page.statusCode, 200);
   assert.match(page.headers['content-type'] ?? '', /text\/html/);
   assert.match(page.body, /Online lobby/);
   assert.equal(script.statusCode, 200);
   assert.match(script.headers['content-type'] ?? '', /javascript/);
+  assert.equal(esMakkerPage.statusCode, 200);
+  assert.match(esMakkerPage.body, /js\/entry\.js/);
+  assert.equal(esMakkerScript.statusCode, 200);
+  assert.match(esMakkerScript.headers['content-type'] ?? '', /javascript/);
 });
 
 test('session endpoint reports an anonymous identity when App Service Authentication is disabled', async () => {
@@ -472,7 +478,7 @@ test('Kasino starts on the server and reconnect returns only each seated playerâ
   assert.equal(duplicateStart.statusCode, 409);
 });
 
-test('Es Makker starts with four hands and a hidden three-card kitty', async () => {
+test('Es Makker starts with four human hands and a hidden three-card kitty', async () => {
   const app = await createApp({
     appServiceAuthEnabled: true,
     lobbyRepository: new MemoryLobbyRepository(),
@@ -484,11 +490,32 @@ test('Es Makker starts with four hands and a hidden three-card kitty', async () 
     payload: {
       gameType: 'es-makker',
       visibility: 'open',
-      humanSeatCount: 1,
-      botSeatCount: 3,
+      humanSeatCount: 4,
+      botSeatCount: 0,
     },
   });
   const tableId = started.json().id as string;
+  for (let index = 1; index < 4; index += 1) {
+    const request = await app.inject({
+      method: 'POST',
+      url: `/api/v1/tables/${tableId}/requests`,
+      headers: authHeaders(`player-${index}`),
+      payload: {},
+    });
+    assert.equal(request.statusCode, 202);
+    const pending = await app.inject({
+      method: 'GET',
+      url: `/api/v1/tables/${tableId}/requests`,
+      headers: authHeaders('host'),
+    });
+    const accepted = await app.inject({
+      method: 'PUT',
+      url: `/api/v1/seat-requests/${pending.json()[0].id}`,
+      headers: authHeaders('host'),
+      payload: { decision: 'accept' },
+    });
+    assert.equal(accepted.statusCode, 204);
+  }
   const start = await app.inject({
     method: 'POST',
     url: `/api/v1/tables/${tableId}/start`,
@@ -496,14 +523,159 @@ test('Es Makker starts with four hands and a hidden three-card kitty', async () 
   });
   assert.equal(start.statusCode, 200);
   const snapshot = start.json();
+  const bidder = await app.inject({
+    method: 'GET',
+    url: `/api/v1/tables/${tableId}/state`,
+    headers: authHeaders(`player-${snapshot.turnSeat}`),
+  });
+  const bidderSnapshot = bidder.json();
   assert.equal(snapshot.gameType, 'es-makker');
   assert.equal(snapshot.phase, 'bidding');
   assert.equal(snapshot.players.length, 4);
   assert.equal(snapshot.hand.length, 13);
   assert.equal(snapshot.kittyCount, 3);
-  assert.equal('kitty' in snapshot, false);
+  assert.equal(bidderSnapshot.legalBids.length, 32);
+  assert.equal(snapshot.kitty.length, 0);
   assert.equal('hands' in snapshot, false);
   assert.equal('userSubject' in snapshot.players[0], false);
+});
+
+test('Es Makker actions are private, phase-checked, and versioned through a complete deal', async () => {
+  const app = await createApp({
+    appServiceAuthEnabled: true,
+    lobbyRepository: new MemoryLobbyRepository(),
+  });
+  const hostSubject = 'host';
+  const create = await app.inject({
+    method: 'POST',
+    url: '/api/v1/tables',
+    headers: authHeaders(hostSubject),
+    payload: {
+      gameType: 'es-makker',
+      visibility: 'open',
+      humanSeatCount: 4,
+      botSeatCount: 0,
+    },
+  });
+  assert.equal(create.statusCode, 201);
+  const tableId = create.json().id as string;
+  for (let seat = 1; seat < 4; seat += 1) {
+    await app.inject({
+      method: 'POST',
+      url: `/api/v1/tables/${tableId}/requests`,
+      headers: authHeaders(`player-${seat}`),
+      payload: {},
+    });
+    const pending = await app.inject({
+      method: 'GET',
+      url: `/api/v1/tables/${tableId}/requests`,
+      headers: authHeaders(hostSubject),
+    });
+    await app.inject({
+      method: 'PUT',
+      url: `/api/v1/seat-requests/${pending.json()[0].id}`,
+      headers: authHeaders(hostSubject),
+      payload: { decision: 'accept' },
+    });
+  }
+  const start = await app.inject({
+    method: 'POST',
+    url: `/api/v1/tables/${tableId}/start`,
+    headers: authHeaders(hostSubject),
+  });
+  assert.equal(start.statusCode, 200);
+  let state = start.json();
+  const subjectForSeat = (seat: number) => seat === 0 ? hostSubject : `player-${seat}`;
+  const getState = async (seat: number) => {
+    const response = await app.inject({
+      method: 'GET',
+      url: `/api/v1/tables/${tableId}/state`,
+      headers: authHeaders(subjectForSeat(seat)),
+    });
+    assert.equal(response.statusCode, 200);
+    return response.json();
+  };
+  const submit = async (seat: number, version: number, action: unknown) => app.inject({
+    method: 'POST',
+    url: `/api/v1/tables/${tableId}/es-makker-actions`,
+    headers: authHeaders(subjectForSeat(seat)),
+    payload: { expectedVersion: version, action },
+  });
+
+  const wrongPlayer = await submit((state.turnSeat + 1) % 4, state.version, { type: 'pass' });
+  assert.equal(wrongPlayer.statusCode, 409);
+
+  for (let pass = 0; pass < 4; pass += 1) {
+    const response = await submit(state.turnSeat, state.version, { type: 'pass' });
+    assert.equal(response.statusCode, 200, response.body);
+    state = response.json();
+  }
+  assert.equal(state.phase, 'bidding');
+  assert.equal(state.dealNumber, 2);
+
+  const declarerSeat = state.turnSeat;
+  const openingBid = await submit(declarerSeat, state.version, {
+    type: 'bid',
+    bid: { kind: 'normal', tricks: 7, variant: 'alm' },
+  });
+  assert.equal(openingBid.statusCode, 200, openingBid.body);
+  state = openingBid.json();
+  for (let pass = 0; pass < 3; pass += 1) {
+    const response = await submit(state.turnSeat, state.version, { type: 'pass' });
+    assert.equal(response.statusCode, 200, response.body);
+    state = response.json();
+  }
+  assert.equal(state.phase, 'trump');
+  state = await getState(declarerSeat);
+  assert.equal(state.legalBids.length, 0);
+
+  const trump = await submit(declarerSeat, state.version, { type: 'choose-trump', suit: 'clubs' });
+  assert.equal(trump.statusCode, 200, trump.body);
+  state = trump.json();
+  assert.equal(state.phase, 'partner');
+  state = await getState(declarerSeat);
+  assert.ok(state.partnerCandidates.length > 0);
+  const partner = await submit(declarerSeat, state.version, {
+    type: 'choose-partner',
+    cardId: state.partnerCandidates[0].cardId,
+  });
+  assert.equal(partner.statusCode, 200, partner.body);
+  state = partner.json();
+  assert.equal(state.phase, 'exchange');
+  assert.equal(state.kitty.length, 3);
+
+  const exchange = await submit(declarerSeat, state.version, { type: 'exchange', take: false });
+  assert.equal(exchange.statusCode, 200, exchange.body);
+  state = exchange.json();
+  assert.equal(state.phase, 'playing');
+  assert.ok(state.legalCardIds.length > 0);
+
+  const stale = await submit(state.turnSeat, state.version - 1, {
+    type: 'play-card',
+    cardId: state.hand[0].id,
+  });
+  assert.equal(stale.statusCode, 409);
+
+  for (let play = 0; play < 52 && state.roundResults.length === 0; play += 1) {
+    state = await getState(state.turnSeat);
+    assert.ok(state.legalCardIds.length > 0);
+    const response = await submit(state.turnSeat, state.version, {
+      type: 'play-card',
+      cardId: state.legalCardIds[0],
+    });
+    assert.equal(response.statusCode, 200, response.body);
+    state = response.json();
+  }
+  assert.equal(state.roundResults.length, 1);
+  assert.equal(state.phase, 'bidding');
+  assert.equal(Object.values(state.scores).reduce((sum: number, score: number) => sum + score, 0), 0);
+
+  const spectator = await app.inject({
+    method: 'GET',
+    url: `/api/v1/tables/${tableId}/state`,
+    headers: authHeaders('spectator'),
+  });
+  assert.equal(spectator.statusCode, 403);
 });
 
 test('a host cannot start a table while requested human seats are still empty', async () => {

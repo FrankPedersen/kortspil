@@ -11,6 +11,7 @@ import {
   getKasinoMoveOptions,
   type KasinoTurnAction,
 } from '../game/kasino-engine.js';
+import { applyEsMakkerAction, type EsMakkerAction } from '../game/es-makker-engine.js';
 
 interface DatabaseTableRow {
   TableId: string;
@@ -676,6 +677,69 @@ export class SqlLobbyRepository implements LobbyRepository {
     }
   }
 
+  async playEsMakkerAction(
+    tableId: string,
+    userSubject: string,
+    expectedVersion: number,
+    action: EsMakkerAction,
+  ) {
+    const transaction = new sql.Transaction(this.pool);
+    await transaction.begin(sql.ISOLATION_LEVEL.SERIALIZABLE);
+    try {
+      const result = await new sql.Request(transaction)
+        .input('tableId', sql.UniqueIdentifier, tableId)
+        .input('userSubject', sql.NVarChar(300), userSubject)
+        .query<{
+          GameType: string;
+          Status: string;
+          StateJson: string | null;
+          SeatNumber: number;
+          StateVersion: number;
+        }>(`
+          SELECT t.GameType, t.Status, t.StateJson, t.StateVersion, s.SeatNumber
+          FROM dbo.GameTables t WITH (UPDLOCK, HOLDLOCK)
+          INNER JOIN dbo.GameSeats s WITH (UPDLOCK, HOLDLOCK)
+            ON s.TableId = t.TableId AND s.IsActive = 1
+          WHERE t.TableId = @tableId AND s.UserSubject = @userSubject;
+        `);
+      const row = result.recordset[0];
+      if (!row) throw new LobbyError(403, 'You do not occupy a seat at this table.');
+      if (row.GameType !== 'es-makker' || row.Status !== 'active' || !row.StateJson) {
+        throw new LobbyError(409, 'This Es Makker game is not active.');
+      }
+      if (row.StateVersion !== expectedVersion) {
+        throw new LobbyError(409, 'The game changed. Refresh the table and try again.');
+      }
+      const state = parseGameState(row.StateJson, 'es-makker');
+      if (state.gameType !== 'es-makker') {
+        throw new LobbyError(409, 'Stored game state does not match the Es Makker table.');
+      }
+      const nextState = applyEsMakkerAction(state, row.SeatNumber, expectedVersion, action);
+      const status = nextState.phase === 'finished' ? 'finished' : 'active';
+      const updated = await new sql.Request(transaction)
+        .input('tableId', sql.UniqueIdentifier, tableId)
+        .input('stateJson', sql.NVarChar(sql.MAX), JSON.stringify(nextState))
+        .input('stateVersion', sql.BigInt, nextState.version)
+        .input('status', sql.VarChar(12), status)
+        .query(`
+          UPDATE dbo.GameTables
+          SET StateJson = @stateJson,
+              StateVersion = @stateVersion,
+              Status = @status,
+              LastActivityAt = SYSUTCDATETIME()
+          WHERE TableId = @tableId AND Status = 'active';
+        `);
+      if (updated.rowsAffected.reduce((total, count) => total + count, 0) !== 1) {
+        throw new LobbyError(409, 'The game changed while the move was being saved.');
+      }
+      await transaction.commit();
+      return createGameSnapshot(nextState, userSubject);
+    } catch (error) {
+      await rollbackPreservingError(transaction);
+      throw error;
+    }
+  }
+
 }
 
 export async function createSqlPool(): Promise<sql.ConnectionPool> {
@@ -709,7 +773,8 @@ function validateComposition(input: CreateTableInput): void {
     !Number.isInteger(input.botSeatCount) ||
     input.humanSeatCount < 1 ||
     input.botSeatCount < 0 ||
-    (input.gameType === 'es-makker' && input.humanSeatCount + input.botSeatCount !== 4) ||
+    (input.gameType === 'es-makker' &&
+      (input.humanSeatCount !== 4 || input.botSeatCount !== 0)) ||
     (input.gameType === 'kasino' &&
       (input.humanSeatCount + input.botSeatCount < 2 || input.humanSeatCount + input.botSeatCount > 4))
   ) {

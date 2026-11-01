@@ -974,11 +974,11 @@ export interface paths {
                             /** @enum {string} */
                             gameType: "es-makker";
                             version: number;
-                            /** @enum {string} */
-                            phase: "bidding";
+                            phase: "bidding" | "trump" | "partner" | "exchange" | "playing" | "finished";
                             roundNumber: number;
+                            dealNumber: number;
                             dealerSeat: number;
-                            currentBidderSeat: number;
+                            turnSeat: number;
                             players: {
                                 seatNumber: number;
                                 kind: "human" | "bot";
@@ -999,7 +999,149 @@ export interface paths {
                             bids: {
                                 seatNumber: number;
                                 kind: "pass" | "bid";
+                                bid: ({
+                                    /** @enum {string} */
+                                    kind: "normal";
+                                    tricks: number;
+                                    variant: "alm" | "vip" | "gode" | "halve";
+                                } | {
+                                    /** @enum {string} */
+                                    kind: "special";
+                                    special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                                }) | null;
                             }[];
+                            highBid: ({
+                                /** @enum {string} */
+                                kind: "normal";
+                                tricks: number;
+                                variant: "alm" | "vip" | "gode" | "halve";
+                            } | {
+                                /** @enum {string} */
+                                kind: "special";
+                                special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                            }) | null;
+                            contract: ({
+                                /** @enum {string} */
+                                kind: "normal";
+                                tricks: number;
+                                variant: "alm" | "vip" | "gode" | "halve";
+                            } | {
+                                /** @enum {string} */
+                                kind: "special";
+                                special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                            }) | null;
+                            declarerSeat: number | null;
+                            trump: ("clubs" | "diamonds" | "hearts" | "spades") | null;
+                            partnerCard: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            } | null;
+                            partnerSeat: number | null;
+                            selfPartner: boolean | null;
+                            partnerKnown: boolean;
+                            partnerFell: boolean;
+                            kittyRevealed: boolean;
+                            shownKitty: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            }[];
+                            kitty: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            }[];
+                            openHands: {
+                                [key: string]: {
+                                    id: string;
+                                    suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                    rank: string | null;
+                                    jokerNo: number;
+                                    isJoker: boolean;
+                                }[];
+                            };
+                            trick: {
+                                seatNumber: number;
+                                card: {
+                                    id: string;
+                                    suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                    rank: string | null;
+                                    jokerNo: number;
+                                    isJoker: boolean;
+                                };
+                            }[];
+                            lastTrick: {
+                                seatNumber: number;
+                                card: {
+                                    id: string;
+                                    suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                    rank: string | null;
+                                    jokerNo: number;
+                                    isJoker: boolean;
+                                };
+                            }[];
+                            lastTrickWinner: number | null;
+                            trickNumber: number;
+                            leaderSeat: number;
+                            tricksWon: {
+                                [key: string]: number;
+                            };
+                            scores: {
+                                [key: string]: number;
+                            };
+                            roundResults: {
+                                roundNumber: number;
+                                dealerSeat: number;
+                                declarerSeat: number;
+                                partnerSeat: number | null;
+                                contract: {
+                                    /** @enum {string} */
+                                    kind: "normal";
+                                    tricks: number;
+                                    variant: "alm" | "vip" | "gode" | "halve";
+                                } | {
+                                    /** @enum {string} */
+                                    kind: "special";
+                                    special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                                };
+                                trump: ("clubs" | "diamonds" | "hearts" | "spades") | null;
+                                tricksWon: {
+                                    [key: string]: number;
+                                };
+                                made: boolean;
+                                basePoints: number;
+                                detail: string;
+                                delta: {
+                                    [key: string]: number;
+                                };
+                                totals: {
+                                    [key: string]: number;
+                                };
+                            }[];
+                            winners: number[];
+                            legalBids: ({
+                                /** @enum {string} */
+                                kind: "normal";
+                                tricks: number;
+                                variant: "alm" | "vip" | "gode" | "halve";
+                            } | {
+                                /** @enum {string} */
+                                kind: "special";
+                                special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                            })[];
+                            partnerCandidates: {
+                                cardId: string;
+                                rank: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades";
+                            }[];
+                            legalCardIds: string[];
                         };
                     };
                 };
@@ -1197,11 +1339,11 @@ export interface paths {
                             /** @enum {string} */
                             gameType: "es-makker";
                             version: number;
-                            /** @enum {string} */
-                            phase: "bidding";
+                            phase: "bidding" | "trump" | "partner" | "exchange" | "playing" | "finished";
                             roundNumber: number;
+                            dealNumber: number;
                             dealerSeat: number;
-                            currentBidderSeat: number;
+                            turnSeat: number;
                             players: {
                                 seatNumber: number;
                                 kind: "human" | "bot";
@@ -1222,7 +1364,149 @@ export interface paths {
                             bids: {
                                 seatNumber: number;
                                 kind: "pass" | "bid";
+                                bid: ({
+                                    /** @enum {string} */
+                                    kind: "normal";
+                                    tricks: number;
+                                    variant: "alm" | "vip" | "gode" | "halve";
+                                } | {
+                                    /** @enum {string} */
+                                    kind: "special";
+                                    special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                                }) | null;
                             }[];
+                            highBid: ({
+                                /** @enum {string} */
+                                kind: "normal";
+                                tricks: number;
+                                variant: "alm" | "vip" | "gode" | "halve";
+                            } | {
+                                /** @enum {string} */
+                                kind: "special";
+                                special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                            }) | null;
+                            contract: ({
+                                /** @enum {string} */
+                                kind: "normal";
+                                tricks: number;
+                                variant: "alm" | "vip" | "gode" | "halve";
+                            } | {
+                                /** @enum {string} */
+                                kind: "special";
+                                special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                            }) | null;
+                            declarerSeat: number | null;
+                            trump: ("clubs" | "diamonds" | "hearts" | "spades") | null;
+                            partnerCard: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            } | null;
+                            partnerSeat: number | null;
+                            selfPartner: boolean | null;
+                            partnerKnown: boolean;
+                            partnerFell: boolean;
+                            kittyRevealed: boolean;
+                            shownKitty: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            }[];
+                            kitty: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            }[];
+                            openHands: {
+                                [key: string]: {
+                                    id: string;
+                                    suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                    rank: string | null;
+                                    jokerNo: number;
+                                    isJoker: boolean;
+                                }[];
+                            };
+                            trick: {
+                                seatNumber: number;
+                                card: {
+                                    id: string;
+                                    suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                    rank: string | null;
+                                    jokerNo: number;
+                                    isJoker: boolean;
+                                };
+                            }[];
+                            lastTrick: {
+                                seatNumber: number;
+                                card: {
+                                    id: string;
+                                    suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                    rank: string | null;
+                                    jokerNo: number;
+                                    isJoker: boolean;
+                                };
+                            }[];
+                            lastTrickWinner: number | null;
+                            trickNumber: number;
+                            leaderSeat: number;
+                            tricksWon: {
+                                [key: string]: number;
+                            };
+                            scores: {
+                                [key: string]: number;
+                            };
+                            roundResults: {
+                                roundNumber: number;
+                                dealerSeat: number;
+                                declarerSeat: number;
+                                partnerSeat: number | null;
+                                contract: {
+                                    /** @enum {string} */
+                                    kind: "normal";
+                                    tricks: number;
+                                    variant: "alm" | "vip" | "gode" | "halve";
+                                } | {
+                                    /** @enum {string} */
+                                    kind: "special";
+                                    special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                                };
+                                trump: ("clubs" | "diamonds" | "hearts" | "spades") | null;
+                                tricksWon: {
+                                    [key: string]: number;
+                                };
+                                made: boolean;
+                                basePoints: number;
+                                detail: string;
+                                delta: {
+                                    [key: string]: number;
+                                };
+                                totals: {
+                                    [key: string]: number;
+                                };
+                            }[];
+                            winners: number[];
+                            legalBids: ({
+                                /** @enum {string} */
+                                kind: "normal";
+                                tricks: number;
+                                variant: "alm" | "vip" | "gode" | "halve";
+                            } | {
+                                /** @enum {string} */
+                                kind: "special";
+                                special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                            })[];
+                            partnerCandidates: {
+                                cardId: string;
+                                rank: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades";
+                            }[];
+                            legalCardIds: string[];
                         };
                     };
                 };
@@ -1552,11 +1836,11 @@ export interface paths {
                             /** @enum {string} */
                             gameType: "es-makker";
                             version: number;
-                            /** @enum {string} */
-                            phase: "bidding";
+                            phase: "bidding" | "trump" | "partner" | "exchange" | "playing" | "finished";
                             roundNumber: number;
+                            dealNumber: number;
                             dealerSeat: number;
-                            currentBidderSeat: number;
+                            turnSeat: number;
                             players: {
                                 seatNumber: number;
                                 kind: "human" | "bot";
@@ -1577,7 +1861,539 @@ export interface paths {
                             bids: {
                                 seatNumber: number;
                                 kind: "pass" | "bid";
+                                bid: ({
+                                    /** @enum {string} */
+                                    kind: "normal";
+                                    tricks: number;
+                                    variant: "alm" | "vip" | "gode" | "halve";
+                                } | {
+                                    /** @enum {string} */
+                                    kind: "special";
+                                    special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                                }) | null;
                             }[];
+                            highBid: ({
+                                /** @enum {string} */
+                                kind: "normal";
+                                tricks: number;
+                                variant: "alm" | "vip" | "gode" | "halve";
+                            } | {
+                                /** @enum {string} */
+                                kind: "special";
+                                special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                            }) | null;
+                            contract: ({
+                                /** @enum {string} */
+                                kind: "normal";
+                                tricks: number;
+                                variant: "alm" | "vip" | "gode" | "halve";
+                            } | {
+                                /** @enum {string} */
+                                kind: "special";
+                                special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                            }) | null;
+                            declarerSeat: number | null;
+                            trump: ("clubs" | "diamonds" | "hearts" | "spades") | null;
+                            partnerCard: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            } | null;
+                            partnerSeat: number | null;
+                            selfPartner: boolean | null;
+                            partnerKnown: boolean;
+                            partnerFell: boolean;
+                            kittyRevealed: boolean;
+                            shownKitty: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            }[];
+                            kitty: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            }[];
+                            openHands: {
+                                [key: string]: {
+                                    id: string;
+                                    suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                    rank: string | null;
+                                    jokerNo: number;
+                                    isJoker: boolean;
+                                }[];
+                            };
+                            trick: {
+                                seatNumber: number;
+                                card: {
+                                    id: string;
+                                    suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                    rank: string | null;
+                                    jokerNo: number;
+                                    isJoker: boolean;
+                                };
+                            }[];
+                            lastTrick: {
+                                seatNumber: number;
+                                card: {
+                                    id: string;
+                                    suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                    rank: string | null;
+                                    jokerNo: number;
+                                    isJoker: boolean;
+                                };
+                            }[];
+                            lastTrickWinner: number | null;
+                            trickNumber: number;
+                            leaderSeat: number;
+                            tricksWon: {
+                                [key: string]: number;
+                            };
+                            scores: {
+                                [key: string]: number;
+                            };
+                            roundResults: {
+                                roundNumber: number;
+                                dealerSeat: number;
+                                declarerSeat: number;
+                                partnerSeat: number | null;
+                                contract: {
+                                    /** @enum {string} */
+                                    kind: "normal";
+                                    tricks: number;
+                                    variant: "alm" | "vip" | "gode" | "halve";
+                                } | {
+                                    /** @enum {string} */
+                                    kind: "special";
+                                    special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                                };
+                                trump: ("clubs" | "diamonds" | "hearts" | "spades") | null;
+                                tricksWon: {
+                                    [key: string]: number;
+                                };
+                                made: boolean;
+                                basePoints: number;
+                                detail: string;
+                                delta: {
+                                    [key: string]: number;
+                                };
+                                totals: {
+                                    [key: string]: number;
+                                };
+                            }[];
+                            winners: number[];
+                            legalBids: ({
+                                /** @enum {string} */
+                                kind: "normal";
+                                tricks: number;
+                                variant: "alm" | "vip" | "gode" | "halve";
+                            } | {
+                                /** @enum {string} */
+                                kind: "special";
+                                special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                            })[];
+                            partnerCandidates: {
+                                cardId: string;
+                                rank: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades";
+                            }[];
+                            legalCardIds: string[];
+                        };
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Default Response */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tables/{tableId}/es-makker-actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit a server-validated Es Makker game action. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    tableId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        expectedVersion: number;
+                        action: {
+                            type: "pass" | "bid" | "choose-trump" | "choose-partner" | "exchange" | "play-card";
+                            bid?: {
+                                /** @enum {string} */
+                                kind: "normal";
+                                tricks: number;
+                                variant: "alm" | "vip" | "gode" | "halve";
+                            } | {
+                                /** @enum {string} */
+                                kind: "special";
+                                special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                            };
+                            suit?: "clubs" | "diamonds" | "hearts" | "spades";
+                            cardId?: string;
+                            take?: boolean;
+                            discardIds?: string[];
+                        };
+                    };
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {string} */
+                            gameType: "kasino";
+                            version: number;
+                            /** @enum {string} */
+                            phase: "playing";
+                            roundNumber: number;
+                            turnSeat: number;
+                            players: {
+                                seatNumber: number;
+                                kind: "human" | "bot";
+                                handCount: number;
+                            }[];
+                            mySeat: number;
+                            hand: ({
+                                id: string;
+                                suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
+                                value: number;
+                                displayName: string;
+                                symbol: string;
+                                name: string;
+                                buildAs: number[];
+                                captureAs: number[];
+                                boardAs: number[];
+                                isSweeper: boolean;
+                            } & {
+                                /** @enum {boolean} */
+                                isBuild?: false;
+                            })[];
+                            board: (({
+                                id: string;
+                                suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
+                                value: number;
+                                displayName: string;
+                                symbol: string;
+                                name: string;
+                                buildAs: number[];
+                                captureAs: number[];
+                                boardAs: number[];
+                                isSweeper: boolean;
+                            } & {
+                                /** @enum {boolean} */
+                                isBuild?: false;
+                            }) | {
+                                id: string;
+                                /** @enum {boolean} */
+                                isBuild: true;
+                                groups: number;
+                                value: number;
+                                owner: number;
+                                cards: ({
+                                    id: string;
+                                    suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
+                                    value: number;
+                                    displayName: string;
+                                    symbol: string;
+                                    name: string;
+                                    buildAs: number[];
+                                    captureAs: number[];
+                                    boardAs: number[];
+                                    isSweeper: boolean;
+                                } & {
+                                    /** @enum {boolean} */
+                                    isBuild?: false;
+                                })[];
+                            })[];
+                            captured: {
+                                [key: string]: ({
+                                    id: string;
+                                    suit: "SPADES" | "HEARTS" | "DIAMONDS" | "CLUBS";
+                                    value: number;
+                                    displayName: string;
+                                    symbol: string;
+                                    name: string;
+                                    buildAs: number[];
+                                    captureAs: number[];
+                                    boardAs: number[];
+                                    isSweeper: boolean;
+                                } & {
+                                    /** @enum {boolean} */
+                                    isBuild?: false;
+                                })[];
+                            };
+                            sweeps: {
+                                [key: string]: number;
+                            };
+                            scores: {
+                                [key: string]: number;
+                            };
+                            lastTaker: number | null;
+                            winner: number | null;
+                        } | {
+                            /** @enum {string} */
+                            gameType: "es-makker";
+                            version: number;
+                            phase: "bidding" | "trump" | "partner" | "exchange" | "playing" | "finished";
+                            roundNumber: number;
+                            dealNumber: number;
+                            dealerSeat: number;
+                            turnSeat: number;
+                            players: {
+                                seatNumber: number;
+                                kind: "human" | "bot";
+                                handCount: number;
+                            }[];
+                            mySeat: number;
+                            hand: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            }[];
+                            handCounts: {
+                                [key: string]: number;
+                            };
+                            kittyCount: number;
+                            bids: {
+                                seatNumber: number;
+                                kind: "pass" | "bid";
+                                bid: ({
+                                    /** @enum {string} */
+                                    kind: "normal";
+                                    tricks: number;
+                                    variant: "alm" | "vip" | "gode" | "halve";
+                                } | {
+                                    /** @enum {string} */
+                                    kind: "special";
+                                    special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                                }) | null;
+                            }[];
+                            highBid: ({
+                                /** @enum {string} */
+                                kind: "normal";
+                                tricks: number;
+                                variant: "alm" | "vip" | "gode" | "halve";
+                            } | {
+                                /** @enum {string} */
+                                kind: "special";
+                                special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                            }) | null;
+                            contract: ({
+                                /** @enum {string} */
+                                kind: "normal";
+                                tricks: number;
+                                variant: "alm" | "vip" | "gode" | "halve";
+                            } | {
+                                /** @enum {string} */
+                                kind: "special";
+                                special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                            }) | null;
+                            declarerSeat: number | null;
+                            trump: ("clubs" | "diamonds" | "hearts" | "spades") | null;
+                            partnerCard: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            } | null;
+                            partnerSeat: number | null;
+                            selfPartner: boolean | null;
+                            partnerKnown: boolean;
+                            partnerFell: boolean;
+                            kittyRevealed: boolean;
+                            shownKitty: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            }[];
+                            kitty: {
+                                id: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                rank: string | null;
+                                jokerNo: number;
+                                isJoker: boolean;
+                            }[];
+                            openHands: {
+                                [key: string]: {
+                                    id: string;
+                                    suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                    rank: string | null;
+                                    jokerNo: number;
+                                    isJoker: boolean;
+                                }[];
+                            };
+                            trick: {
+                                seatNumber: number;
+                                card: {
+                                    id: string;
+                                    suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                    rank: string | null;
+                                    jokerNo: number;
+                                    isJoker: boolean;
+                                };
+                            }[];
+                            lastTrick: {
+                                seatNumber: number;
+                                card: {
+                                    id: string;
+                                    suit: "clubs" | "diamonds" | "hearts" | "spades" | null;
+                                    rank: string | null;
+                                    jokerNo: number;
+                                    isJoker: boolean;
+                                };
+                            }[];
+                            lastTrickWinner: number | null;
+                            trickNumber: number;
+                            leaderSeat: number;
+                            tricksWon: {
+                                [key: string]: number;
+                            };
+                            scores: {
+                                [key: string]: number;
+                            };
+                            roundResults: {
+                                roundNumber: number;
+                                dealerSeat: number;
+                                declarerSeat: number;
+                                partnerSeat: number | null;
+                                contract: {
+                                    /** @enum {string} */
+                                    kind: "normal";
+                                    tricks: number;
+                                    variant: "alm" | "vip" | "gode" | "halve";
+                                } | {
+                                    /** @enum {string} */
+                                    kind: "special";
+                                    special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                                };
+                                trump: ("clubs" | "diamonds" | "hearts" | "spades") | null;
+                                tricksWon: {
+                                    [key: string]: number;
+                                };
+                                made: boolean;
+                                basePoints: number;
+                                detail: string;
+                                delta: {
+                                    [key: string]: number;
+                                };
+                                totals: {
+                                    [key: string]: number;
+                                };
+                            }[];
+                            winners: number[];
+                            legalBids: ({
+                                /** @enum {string} */
+                                kind: "normal";
+                                tricks: number;
+                                variant: "alm" | "vip" | "gode" | "halve";
+                            } | {
+                                /** @enum {string} */
+                                kind: "special";
+                                special: "sol" | "rensol" | "bordlaegger" | "superbordlaegger";
+                            })[];
+                            partnerCandidates: {
+                                cardId: string;
+                                rank: string;
+                                suit: "clubs" | "diamonds" | "hearts" | "spades";
+                            }[];
+                            legalCardIds: string[];
                         };
                     };
                 };

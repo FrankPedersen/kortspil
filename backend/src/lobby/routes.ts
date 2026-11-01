@@ -12,6 +12,7 @@ import {
 } from './types.js';
 import { GameSnapshotSchema } from '../game/state.js';
 import type { KasinoActionType } from '../game/kasino-engine.js';
+import { EsMakkerActionSchema, type EsMakkerAction } from '../game/es-makker-engine.js';
 
 const ErrorResponse = Type.Object({ message: Type.String() });
 const ErrorResponses = {
@@ -318,6 +319,36 @@ export async function registerLobbyRoutes(
       };
     };
     const snapshot = await repository.playKasinoTurn(
+      tableId,
+      principal.subject,
+      expectedVersion,
+      action,
+    );
+    reply.header('Cache-Control', 'no-store');
+    return snapshot;
+  });
+
+  app.post('/api/v1/tables/:tableId/es-makker-actions', {
+    config: { rateLimit: { max: 90, timeWindow: '1 minute' } },
+    schema: {
+      tags: ['games'],
+      summary: 'Submit a server-validated Es Makker game action.',
+      params: Type.Object({ tableId: Type.String({ format: 'uuid' }) }),
+      body: Type.Object({
+        expectedVersion: Type.Integer({ minimum: 1 }),
+        action: EsMakkerActionSchema,
+      }, { additionalProperties: false }),
+      response: { 200: GameSnapshotSchema, ...ErrorResponses },
+    },
+  }, async (request, reply) => {
+    const principal = getPrincipal(request, reply, options);
+    if (!principal) return reply;
+    const { tableId } = request.params as { tableId: string };
+    const { expectedVersion, action } = request.body as {
+      expectedVersion: number;
+      action: EsMakkerAction;
+    };
+    const snapshot = await repository.playEsMakkerAction(
       tableId,
       principal.subject,
       expectedVersion,
